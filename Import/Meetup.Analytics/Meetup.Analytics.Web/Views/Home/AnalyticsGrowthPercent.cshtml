@@ -1,0 +1,71 @@
+﻿@{
+    ViewBag.Title = "Analytics Growth Percent";
+}
+
+<h2>Analytics Growth Percent</h2>
+<h3>This metric reports back categorical growth percent day over day of the top 5 tags related to the '@ViewBag.tag' tag for groups located in '@ViewBag.city'.</h3>
+<script>
+(function() {
+   // Load the script
+   var script1 = document.createElement("SCRIPT");
+   script1.src = 'http://code.highcharts.com/highcharts.js';
+   script1.type = 'text/javascript';
+   
+   document.getElementsByTagName("head")[0].appendChild(script1);
+   
+   var script2 = document.createElement("SCRIPT");
+   script2.src = 'http://code.highcharts.com/modules/exporting.js';
+   script2.type = 'text/javascript';
+   
+   document.getElementsByTagName("head")[0].appendChild(script2);
+   
+    // Poll for highcharts
+    var checkReady = function(callback) {
+        if (jQuery().highcharts) {
+            callback(jQuery);
+        }
+        else {
+            window.setTimeout(function() { checkReady(callback); }, 1000);
+        }
+    };
+   
+   checkReady(function($) {
+       $('#container').highcharts({
+               title: {
+                   text: '@ViewBag.tag Meetup Members in @ViewBag.city',
+                   x: -20//center
+               },
+               subtitle: {
+                   text: 'Source: Meetup.com',
+                   x: -20
+               },
+               xAxis: {
+                   categories: @Html.Raw(ViewBag.categories)
+               },
+               yAxis: {
+                   title: {
+                       text: 'Membership'
+                   },
+                   plotLines: [
+                       {
+                           value: 0,
+                           width: 1,
+                           color: '#808080'
+                       }
+                   ]
+               },
+               tooltip: {
+                   valueSuffix: '%'
+               },
+               legend: {
+                   layout: 'vertical',
+                   align: 'right',
+                   verticalAlign: 'middle',
+                   borderWidth: 0
+               },
+               series: @Html.Raw(ViewBag.series)
+           });
+        });
+   })();
+</script>
+<div id="container" style="min-width: 310px; height: 800px; margin: 0 auto"></div>

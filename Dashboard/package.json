@@ -1,0 +1,37 @@
+{
+  "name": "neo4j-app-movies-ui",
+  "version": "0.0.1",
+  "author": "Kenny Bastani <kenny.bastani@neotechnology.com> (https://github.com/kbastani)",
+  "description": "A movie browser demo powered by Neo4j",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kbastani/neo4j-app-movies-ui.git"
+  },
+  "keywords": [
+    "node",
+    "neo4j",
+    "express",
+    "api",
+    "http",
+    "rest",
+    "swagger",
+    "server",
+    "movies"
+  ],
+  "engines": {
+    "node": "0.10.x"
+  },
+  "dependencies": {
+    "connect": ">= 1.8.x"
+  },
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "5e3a37dcf45478f40b67bb97576b687b9432cd7e",
+  "bugs": {
+    "url": "https://github.com/kbastani/neo4j-app-movies-ui/issues"
+  },
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
