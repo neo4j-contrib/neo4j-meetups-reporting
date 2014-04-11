@@ -321,7 +321,7 @@ Array.prototype.getUnique = function(){
         $(table).empty();
 
         // Get months between the dates
-        var monthCount = monthDiff(new Date(from), new Date(to)) + 1;
+        var monthCount = monthDiff(new Date(from), new Date(to));
         console.log(monthCount);
 
         var categories = [];

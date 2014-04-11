@@ -83,16 +83,16 @@ var _getMonthlyGrowthPercent = function (params, options, callback) {
     groups: params.groups
   };
   var query = [
-    'MATCH (day:Day) WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
-    'MATCH (day)<-[:HAS_DAY]-(month:Month)',
+    'MATCH (d:Day)<-[:HAS_DAY]-(month:Month)',
+    'WHERE d.timestamp > { startDate } AND d.timestamp < { endDate }',
     'WITH DISTINCT month',
-    'MATCH (month)-[:HAS_DAY]->(day:Day)<-[:ON_DAY]-(stats:Stats)<-[:HAS_MEMBERS]-(group:Group)-[:LOCATED_IN]->(location:Location),',
-    '      (group)-[:HAS_TAG]->(tag:Tag)',
-    'WHERE tag.tag in { topics }' + (params.city ? ' AND location.city = { city }' : '')  + (params.country ? ' AND location.country = { country }' : '') + (params.groups.length > 0 ? ' AND group.name in { groups }' : ''),
-    'WITH day, month, group, stats',
-    'ORDER BY day.timestamp',
-    'WITH month, head(collect(day)) as day, group',
-    'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)',
+    'MATCH (month:Month)-[:HAS_DAY]->(day:Day { day: 1 })',
+    'MATCH (tag:Tag), (location:Location)',
+    'WHERE tag.tag in { topics }' + (params.city ? ' AND location.city = { city }' : '')  + (params.country ? ' AND location.country = { country }' : ''),
+    'WITH tag, location, day',
+    'MATCH (tag)-[:HAS_TAG]-(group:Group),',
+    '      (group)-[:LOCATED_IN]->(location),',
+    '      (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
     'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as month, group.name as group, stats.count as members, day',
     'ORDER BY day.timestamp',
     'RETURN month, group, members'
