@@ -165,22 +165,28 @@ namespace Meetup.Analytics.Services.Implementations
         /// <param name="meetupCity">The meetup city to search for on the Meetup.com API.</param>
         /// <param name="tag">The Meetup.com topic to limit results to.</param>
         /// <returns>Returns a CSV string containing the normalized Neo4j graph data model.</returns>
-        public string GetMeetupCityCsvByTagAndInterpolate(MeetupCity meetupCity, string tag)
+        public List<string> GetMeetupCityCsvByTagAndInterpolate(List<MeetupCity> meetupCity, string tag)
         {
+
+            int batchCount = 120;
 
             // Generate CSV file with headers
             string header = "group_name,group_location,group_country,group_state,group_tag,group_stats,month,day,year,day_timestamp,day_of_week,week_of_year,last_month,last_day,last_year,group_creation_date,group_creation_date_year,group_creation_date_month,group_creation_date_day";
+
+            List<string> csvBatches = new List<string>();
 
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine(header);
 
+            int lineCount = 0;
+
             DateTime today = DateTime.Now;
             DateTime yesterday = DateTime.Now.Subtract(TimeSpan.FromDays(1));
 
-            //foreach (var city in meetupCity)
-            //{
-            var city= meetupCity; 
+            foreach (var city in meetupCity)
+            {
+            //var city= meetupCity; 
                 MeetupGroups meetupGroups = this.GetMeetupGroups(tag, city.country, city.city, 100, city.state);
 
                 meetupGroups.results.ForEach(mg =>
@@ -209,7 +215,7 @@ namespace Meetup.Analytics.Services.Implementations
                     {
                         sb.AppendLine(new string[] { 
                             mg.name, 
-                            mg.city.Replace("München", "Munich").Replace("Malmö", "Malmo"),
+                            mg.city.Replace("München", "Munich").Replace("Malmö", "Malmo").Replace("Washington, DC", "Washington DC"),
                             mg.country,
                             mg.state ?? "",
                             topic.name, 
@@ -230,6 +236,18 @@ namespace Meetup.Analytics.Services.Implementations
                         }.Select(s => StringToCSVCell(s))
                             .ToList()
                             .Aggregate((a, b) => string.Format("{0},{1}", a, b)));
+
+                        if (lineCount > batchCount)
+                        {
+                            csvBatches.Add(sb.ToString());
+                            sb = new StringBuilder();
+                            sb.AppendLine(header);
+                            lineCount = 0;
+                        }
+                        else
+                        {
+                            lineCount++;
+                        }
                     }
 
                     for (int i = (membershipPoints.Length > 365) ? membershipPoints.Length - 365 : 0; i < membershipPoints.Length; i++)
@@ -240,7 +258,7 @@ namespace Meetup.Analytics.Services.Implementations
 
                         sb.AppendLine(new string[] { 
                             mg.name, 
-                            mg.city.Replace("München", "Munich").Replace("Malmö", "Malmo"),
+                            mg.city.Replace("München", "Munich").Replace("Malmö", "Malmo").Replace("Washington, DC", "Washington DC"),
                             mg.country,
                             mg.state ?? "",
                             "NoSQL", 
@@ -261,11 +279,30 @@ namespace Meetup.Analytics.Services.Implementations
                         }.Select(s => StringToCSVCell(s))
                             .ToList()
                             .Aggregate((a, b) => string.Format("{0},{1}", a, b)));
+
+                        if (lineCount > batchCount)
+                        {
+                            csvBatches.Add(sb.ToString());
+                            sb = new StringBuilder();
+                            sb.AppendLine(header);
+                            lineCount = 0;
+                        }
+                        else
+                        {
+                            lineCount++;
+                        }
                     }
                 });
-            //}
+            }
 
-            return sb.ToString();
+            if (lineCount > 0)
+            {
+                csvBatches.Add(sb.ToString());
+                sb = new StringBuilder();
+                sb.AppendLine(header);
+            }
+
+            return csvBatches;
         }
 
         public DateTime FromUnixTime(long unixTime)

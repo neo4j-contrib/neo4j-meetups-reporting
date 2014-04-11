@@ -78,6 +78,7 @@ var _getMonthlyGrowthPercent = function (params, options, callback) {
     startDate: params.startDate,
     endDate: params.endDate,
     city: params.city,
+    country: params.country,
     topics: params.topics,
     groups: params.groups
   };
@@ -89,7 +90,7 @@ var _getMonthlyGrowthPercent = function (params, options, callback) {
     'WITH DISTINCT month',
     'MATCH (month)-[:HAS_DAY]->(day:Day)<-[:ON_DAY]-(stats:Stats)<-[:HAS_MEMBERS]-(group:Group)-[:LOCATED_IN]->(location:Location),',
     '      (group)-[:HAS_TAG]->(tag:Tag)',
-    'WHERE tag.tag in { topics }' + (params.city ? ' AND location.city = { city }' : '') + (params.groups.length > 0 ? ' AND group.name in { groups }' : ''),
+    'WHERE tag.tag in { topics }' + (params.city ? ' AND location.city = { city }' : '')  + (params.country ? ' AND location.country = { country }' : '') + (params.groups.length > 0 ? ' AND group.name in { groups }' : ''),
     'WITH day, month, group, stats',
     'ORDER BY day.timestamp',
     'WITH month, head(collect(day)) as day, group',

@@ -37,13 +37,11 @@ namespace MeetupPollingWorker
 
                 if (cities != null)
                 {
-                    foreach (var city in cities)
-                    {
-                        if (city.city == "San Francisco")
-                        {
-                            DataCollectionClient.Send(new BrokeredMessage(city));
-                        }
-                    }
+                 
+
+                            DataCollectionClient.Send(new BrokeredMessage(cities));
+                        
+                    
                     
                     //Console.WriteLine(string.Format("Meetup city poll request sent: {0}, {1}", city.city, city.country));
 

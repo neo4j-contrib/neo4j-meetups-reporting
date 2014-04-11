@@ -36,7 +36,7 @@ namespace DataCollectionWorker
                         Trace.WriteLine("Processing Service Bus message: " + receivedMessage.SequenceNumber.ToString());
 
                         // Receive the message
-                        var meetupCity = receivedMessage.GetBody<MeetupCity>();
+                        var meetupCity = receivedMessage.GetBody<List<MeetupCity>>();
 
                         // Populated the graph database using LOAD CSV from Meetup.com API
                         Import.PopulateGraphDatabaseFromCsv(new MeetupClient("4b1b7a4c4027718192d1e73723135b").GetMeetupCityCsvByTagAndInterpolate(meetupCity, "NoSQL"));

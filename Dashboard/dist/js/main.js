@@ -253,6 +253,14 @@ Highcharts.theme = {
 // Apply the theme
 var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
 
+$( ".group-location, .group-tags" ).keypress(function( event ) {
+  if ( event.which == 13 ) {
+    event.preventDefault();
+
+    getReport($("#from").val(), $("#to").val());
+  }
+});
+
            $("#from").datepicker({
                defaultDate: "+1w",
                changeMonth: true,
@@ -289,7 +297,7 @@ Array.prototype.getUnique = function(){
 
     var getReport = function(from, to)
     {
-      $.getJSON( "http://localhost:3000/api/v0/analytics/monthlygrowth?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&city=San%20Francisco&topics=NoSQL&groups=Bay%20Area%20Graph%20Geeks%2C%20The%20San%20Francisco%20Redis%20Meetup%20Group%2C%20San%20Francisco%20Apache%20Cassandra%20User%20Group%2C%20San%20Francisco%20MongoDB%20User%20Group%2C%20Graph%20Database%20-%20San%20Francisco%2C%20San%20Francisco%20Riak%20Meetup%2CThe%20San%20Francisco%20Couchbase%20Group&api_key=special-key&neo4j=true", function( data ) {
+      $.getJSON( "http://localhost:3000/api/v0/analytics/monthlygrowth?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&city=" + encodeURIComponent($(".group-location").val()) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function( data ) {
         var table = $(".table-result-view tbody");
 
         $(table).empty();
@@ -324,7 +332,7 @@ Array.prototype.getUnique = function(){
           });
 
           series.push({ name: item, data: dataPoints })
-          seriesVariance.push({name: item, data: (jStat(dataPoints).max() - jStat(dataPoints).min()) / jStat(dataPoints).min() })
+          seriesVariance.push({name: item, data: (jStat(dataPoints).max() - jStat(dataPoints).min()) / jStat([jStat(dataPoints).min(), 1]).max() })
           
         });
 
@@ -348,7 +356,7 @@ var buildChart = function(categories, series)
             {
               $('#container').highcharts({
                   title: {
-                      text: 'NoSQL Meetup Members in San Francisco',
+                      text: $(".group-location").val() + ' Meetup Members in ' + $(".group-location").val(),
                       x: -20 //center
                   },
                   subtitle: {

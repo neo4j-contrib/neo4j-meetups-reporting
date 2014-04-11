@@ -92,6 +92,7 @@ exports.getMonthlyGrowthPercent = {
       param.query("startDate", "A date to retrieve results from. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
       param.query("endDate", "A date to retrieve results until. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
       param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+      param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
       param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
       param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
     ],
@@ -107,6 +108,7 @@ exports.getMonthlyGrowthPercent = {
     var startDate = parseUrl(req, 'startDate');
     var endDate = parseUrl(req, 'endDate');
     var location = parseUrl(req, 'city');
+    var country = parseUrl(req, 'country');
     var topics = _.invoke(parseUrl(req, 'topics').split(','), 'trim');
     var groups = parseUrl(req, 'groups') ? _.invoke(parseUrl(req, 'groups').split(','), 'trim') : [];
     
@@ -117,6 +119,7 @@ exports.getMonthlyGrowthPercent = {
       startDate: { day: dateFrom.getDate(), month: dateFrom.getMonth(), year: dateFrom.getFullYear() },
       endDate: { day: dateTo.getDate(), month: dateTo.getMonth(), year: dateTo.getFullYear() },
       city: location,
+      country: country,
       topics: topics,
       groups: groups
     };

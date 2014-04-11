@@ -15,28 +15,29 @@ namespace Meetup.Analytics.Services.Implementations
     /// </summary>
     public class Import
     {
-        public static Uri PopulateGraphDatabaseFromCsv(string csvFile)
+        public static void PopulateGraphDatabaseFromCsv(List<string> csvFiles)
         {
-            // Create file HTTP request hook
-            Uri blobUri = BlobService.PutBlobGetUri("csvfile", Guid.NewGuid().ToString(), new MemoryStream(Encoding.UTF8.GetBytes(csvFile)), "cache");
+            GraphClient graphClient = CloudGraph.GetNeo4jGraphClient();
+            graphClient.Connect();
 
-            // Run Cypher query for data import
-            SaveToDatabase(blobUri.ToString());
+            foreach (var csvFile in csvFiles)
+            {
+                // Create file HTTP request hook
+                Uri blobUri = BlobService.PutBlobGetUri("csvfile", Guid.NewGuid().ToString(), new MemoryStream(Encoding.UTF8.GetBytes(csvFile)), "cache");
 
-            return blobUri;
+                // Run Cypher query for data import
+                SaveToDatabase(blobUri.ToString(), graphClient);
+            }
         }
 
         /// <summary>
         /// Populate database from cloud hosted CSV file.
         /// </summary>
         /// <param name="uri">The URI of the CSV file hosted on Windows Azure Blob Storage.</param>
-        private static void SaveToDatabase(string uri)
+        private static void SaveToDatabase(string uri, GraphClient graphClient)
         {
-            GraphClient graphClient = CloudGraph.GetNeo4jGraphClient();
-            graphClient.Connect();
-
             var sb = new StringBuilder();
-            sb.AppendLine("USING PERIODIC COMMIT 10000");
+            //sb.AppendLine("USING PERIODIC COMMIT 50000");
             sb.AppendLine("LOAD CSV WITH HEADERS FROM");
             sb.AppendLine(string.Format(@"    ""{0}""", uri.Replace("https://", "http://")));
             sb.AppendLine("AS csvLine");
@@ -64,9 +65,10 @@ namespace Meetup.Analytics.Services.Implementations
             sb.AppendLine("MERGE (group)-[:HAS_MEMBERS]->(stats)");
             sb.AppendLine("MERGE (stats)-[:ON_DAY]->(day)");
             sb.AppendLine("MERGE (lastDay)-[:NEXT]->(day)");
+            sb.AppendLine("RETURN day.day as day");
 
             var cypher = new CypherFluentQueryCreator(graphClient, new CypherQueryCreator(sb.ToString()), new Uri(CloudGraph.GetDatabaseUri()));
-            cypher.ExecuteCustomQueryWithoutResults();
+            var day = cypher.ExecuteGetCypherResults<SeriesDay>().Result;
         }
     }
 }
