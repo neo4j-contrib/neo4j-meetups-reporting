@@ -321,7 +321,7 @@ Array.prototype.getUnique = function(){
         $(table).empty();
 
         // Get months between the dates
-        var monthCount = monthDiff(new Date(from), new Date(to));
+        var monthCount = monthDiff(new Date(from), new Date(to)) + 1;
         console.log(monthCount);
 
         var categories = [];
@@ -343,7 +343,7 @@ Array.prototype.getUnique = function(){
         $.each(names, function(i, item)
         {
           var dataPoints = [];
-
+          var dataPointValues = [];
           
           
           $.each(data, function(key, val)
@@ -356,13 +356,17 @@ Array.prototype.getUnique = function(){
               dataPointsArr.push(utcDateTime);
               dataPointsArr.push(val.members);
               dataPoints.push(dataPointsArr);
+              dataPointValues.push(val.members);
             };
           });
 
           series.push({ name: item, data: dataPoints })
 
-          //seriesVariance.push({name: item, data: (jStat(dataPoints).max() - jStat(dataPoints).min()) / jStat([jStat(dataPoints).min(), 1]).max() })
-          
+          // Only measure annual percent growth for groups older than a year
+          if (dataPointValues.length > monthCount)
+          {
+            seriesVariance.push({name: item, data: (jStat(dataPointValues).max() - jStat(dataPointValues).min()) / jStat([jStat(dataPointValues).min(), 1]).max() });
+          }
         });
 
         seriesVariance.sort(function(a,b){return b.data-a.data});
@@ -395,7 +399,8 @@ var buildChart = function(categories, series)
                 type: 'datetime',
                 dateTimeLabelFormats: { // don't display the dummy year
                     month: '%b %y',
-                    year: '%y'
+                    year: '%y',
+                    day: '%d'
                 }
             },
             yAxis: {
