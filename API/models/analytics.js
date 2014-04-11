@@ -75,18 +75,16 @@ var _getWeeklyGrowthPercent = function (params, options, callback) {
 
 var _getMonthlyGrowthPercent = function (params, options, callback) {
   var cypher_params = {
-    startDate: params.startDate,
-    endDate: params.endDate,
+    startDate: getTicks(params.startDate),
+    endDate: getTicks(params.endDate),
     city: params.city,
     country: params.country,
     topics: params.topics,
     groups: params.groups
   };
   var query = [
-    'MATCH (dayStart:Day { day: { startDate }.day, month: { startDate }.month, year: { startDate }.year }),',
-    '(dayEnd:Day { day: { endDate }.day, month: { endDate }.month, year: { endDate }.year })', 
-    'MATCH (dayStart)-[:NEXT*0..]->(day:Day)-[:NEXT*0..]->(dayEnd),',
-    '      (day)<-[:HAS_DAY]-(month:Month)',
+    'MATCH (day:Day) WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'MATCH (day)<-[:HAS_DAY]-(month:Month)',
     'WITH DISTINCT month',
     'MATCH (month)-[:HAS_DAY]->(day:Day)<-[:ON_DAY]-(stats:Stats)<-[:HAS_MEMBERS]-(group:Group)-[:LOCATED_IN]->(location:Location),',
     '      (group)-[:HAS_TAG]->(tag:Tag)',
@@ -116,3 +114,11 @@ module.exports = {
   getWeeklyGrowthPercent: getWeeklyGrowthPercent,
   getMonthlyGrowthPercent: getMonthlyGrowthPercent
 };
+
+function getTicks(dateTime)
+{
+
+  var ticks = ((dateTime.getTime() * 10000) + 621355968000000000);
+
+  return ticks;
+}

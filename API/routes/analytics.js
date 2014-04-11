@@ -116,8 +116,8 @@ exports.getMonthlyGrowthPercent = {
     var dateTo = new Date(endDate);
 
     var params = {
-      startDate: { day: dateFrom.getDate(), month: dateFrom.getMonth(), year: dateFrom.getFullYear() },
-      endDate: { day: dateTo.getDate(), month: dateTo.getMonth(), year: dateTo.getFullYear() },
+      startDate: dateFrom,
+      endDate: dateTo,
       city: location,
       country: country,
       topics: topics,

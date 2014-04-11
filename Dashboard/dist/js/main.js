@@ -261,6 +261,16 @@ $( ".group-location, .group-tags" ).keypress(function( event ) {
   }
 });
 
+var today = new Date();
+
+var todayMinusYear = new Date(); 
+
+todayMinusYear.setDate(today.getDate() - 365); // minus the date
+
+$("#from").val(todayMinusYear.getMonth() + 1 + "/" + todayMinusYear.getDate() + "/" + todayMinusYear.getFullYear());
+
+$("#to").val(today.getMonth() + 1 + "/" + today.getDate() + "/" + today.getFullYear());
+
            $("#from").datepicker({
                defaultDate: "+1w",
                changeMonth: true,
@@ -295,6 +305,14 @@ Array.prototype.getUnique = function(){
        return a;
       };
 
+      function monthDiff(d1, d2) {
+    var months;
+    months = (d2.getFullYear() - d1.getFullYear()) * 12;
+    months -= d1.getMonth() + 1;
+    months += d2.getMonth();
+    return months <= 0 ? 0 : months;
+}
+
     var getReport = function(from, to)
     {
       $.getJSON( "http://localhost:3000/api/v0/analytics/monthlygrowth?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&city=" + encodeURIComponent($(".group-location").val()) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function( data ) {
@@ -302,7 +320,9 @@ Array.prototype.getUnique = function(){
 
         $(table).empty();
 
-        
+        // Get months between the dates
+        var monthCount = monthDiff(new Date(from), new Date(to));
+        console.log(monthCount);
 
         var categories = [];
         var series = [];
@@ -323,16 +343,25 @@ Array.prototype.getUnique = function(){
         $.each(names, function(i, item)
         {
           var dataPoints = [];
+
+          
+          
           $.each(data, function(key, val)
           {
             if (val.group == item) 
             { 
-              dataPoints.push(val.members);
+              dataPointsArr = [];
+              var thisDateTime = new Date(val.month);
+              var utcDateTime = Date.UTC(thisDateTime.getUTCFullYear(), thisDateTime.getUTCMonth(), thisDateTime.getUTCDate());
+              dataPointsArr.push(utcDateTime);
+              dataPointsArr.push(val.members);
+              dataPoints.push(dataPointsArr);
             };
           });
 
           series.push({ name: item, data: dataPoints })
-          seriesVariance.push({name: item, data: (jStat(dataPoints).max() - jStat(dataPoints).min()) / jStat([jStat(dataPoints).min(), 1]).max() })
+
+          //seriesVariance.push({name: item, data: (jStat(dataPoints).max() - jStat(dataPoints).min()) / jStat([jStat(dataPoints).min(), 1]).max() })
           
         });
 
@@ -346,8 +375,6 @@ Array.prototype.getUnique = function(){
           table.append(items.join());
         });
 
-console.log(seriesVariance);
-
 buildChart(categories, series);                
 });
 };
@@ -355,36 +382,35 @@ buildChart(categories, series);
 var buildChart = function(categories, series)
             {
               $('#container').highcharts({
-                  title: {
-                      text: $(".group-location").val() + ' Meetup Members in ' + $(".group-location").val(),
-                      x: -20 //center
-                  },
-                  subtitle: {
-                      text: 'Source: Meetup.com',
-                      x: -20
-                  },
-                  xAxis: {
-                      categories: categories
-                  },
-                  yAxis: {
-                      title: {
-                          text: 'Membership'
-                      },
-                      plotLines: [{
-                          value: 0,
-                          width: 1,
-                          color: '#808080'
-                      }]
-                  },
-                  tooltip: {
-                      valueSuffix: ' Members'
-                  },
-                  legend: {
-                      layout: 'vertical',
-                      align: 'right',
-                      verticalAlign: 'middle',
-                      borderWidth: 0
-                  },
-                  series: series
+                  chart: {
+                type: 'spline'
+            },
+            title: {
+                text: $(".group-tags").val() + ' Meetup Members in ' + $(".group-location").val(),
+            },
+            subtitle: {
+                text: 'Meetup.com data'
+            },
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: { // don't display the dummy year
+                    month: '%b %y',
+                    year: '%y'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Group Members'
+                },
+                min: 0
+            },
+            tooltip: {
+                formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                        Highcharts.dateFormat("%b '%y", this.x) +' - '+ this.y +' members';
+                }
+            },
+            
+            series: series
               });
             };
