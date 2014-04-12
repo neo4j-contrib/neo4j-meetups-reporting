@@ -6,8 +6,6 @@ A graph-based analytics platform to track and measure meetup.com groups growth o
 
 ## Architecutre
 
-The main components of the archiecture include:
-
 * Front-end web-based dashboard in Node.js and bootstrap
 * REST API via Neo4j Swagger in Node.js
 * Data import services in .NET C#
