@@ -11,20 +11,20 @@ The main components of the archiecture include:
 
 ### Prerequisites
 
-* An instance of Neo4j(>=2.0) running locally. ([http://www.neo4j.org/download](http://www.neo4j.org/download_thanks?edition=community&release=2.1.0-M01))
+* An instance of Neo4j(>=2.0) running locally - [http://www.neo4j.org/download](http://www.neo4j.org/download_thanks?edition=community&release=2.1.0-M01)
 * Microsoft Visual Studio (>=2012) for data import services. (Not required for running dashboard)
-* A Meetup.com API Key for data import services ([http://api.meetup.com/])
+* A Meetup.com API Key for data import services - [http://api.meetup.com/]
 
 ### Usage
 
-* Unzip the store files located in /neo4j/datastore.zip into the data directory of your choice and start a Neo4j 2.1.0-M01 that is configured to use the unzipped store files. (Copy data folder into Neo4j install directory by default)
-* Start the Neo4j server at `http://localhost:7474`
-* Make sure `node.js` and `npm` installed on your machine
-* `cd` to the `api` directory of this project and in the terminal or console and type `npm install` and enter, after `node_modules` are installed type, `node app` and enter. The REST API will be started at `http://localhost:3000/`.
-* `cd` to the `dashboard` directory of this project and in the terminal or console and type `npm install` and enter, after `node_modules` are installed, type `node app` and enter. The front-end analytics dashboard will be started at `http://localhost:5000/`.
+* Unzip the store files located in `/neo4j/datastore.zip`
+* Start the Neo4j server configured to the data store files and mapped to `http://localhost:7474`
+* Install `node.js` and `npm` on your machine
+* `cd` to the `api` directory of this project and in the terminal or console and type `npm install` and enter, after `node_modules` are installed type, `node app` and enter. The REST API will be started at `http://localhost:3000/`
+* `cd` to the `dashboard` directory of this project and in the terminal or console and type `npm install` and enter, after `node_modules` are installed, type `node app` and enter. The front-end analytics dashboard will be started at `http://localhost:5000/`
 
-### Specifications
+### Project Outline
 
-You can find the project specifications as a ([GraphGist project](http://gist.neo4j.org])) app at ([Neo4j for Graph Analytics Part I: Meetup Analytics](http://gist.neo4j.org/?e2e0e4469917729765fe)]
+You can find the project specifications as a [GraphGist project](http://gist.neo4j.org]))app at [Neo4j for Graph Analytics Part I: Meetup Analytics](http://gist.neo4j.org/?e2e0e4469917729765fe)
 
 ![Meetup Analytics Dashboard](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/specifications/Images/Meetup%20Analytics%20Dashboard%20-%20Screen.png)
