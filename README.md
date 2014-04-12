@@ -25,6 +25,6 @@ The main components of the archiecture include:
 
 ### Specifications
 
-You can find the project specifications as a ([http://gist.neo4j.org](GraphGist)) app at ([http://gist.neo4j.org/?e2e0e4469917729765fe](Neo4j for Graph Analytics Part I: Meetup Analytics)]
+You can find the project specifications as a ([GraphGist project](http://gist.neo4j.org])) app at ([Neo4j for Graph Analytics Part I: Meetup Analytics](http://gist.neo4j.org/?e2e0e4469917729765fe)]
 
-image::https://raw.githubusercontent.com/kbastani/meetup-analytics/master/specifications/Images/meetup-analytics-graph-gist.png[Meetup Analytics Graph Data Model]
+![Neo4j for Graph Analytics Part I: Meetup Analytics](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/specifications/Images/meetup-analytics-graph-gist.png)
