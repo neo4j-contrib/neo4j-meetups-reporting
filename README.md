@@ -30,7 +30,7 @@ Check out a demo of the dashboard: [Meetup Analytics NoSQL Dashboard](http://mee
 
 ### Specifications
 
-You can find the project specifications as a [GraphGist project](http://gist.neo4j.org) app at [Neo4j for Graph Analytics Part I: Meetup Analytics](http://gist.neo4j.org/?e2e0e4469917729765fe)
+You can find the project specifications as a [GraphGist project](http://gist.neo4j.org) app at [Neo4j for Graph Analytics: Meetup.com Example](http://gist.neo4j.org/?e2e0e4469917729765fe)
 
 ### Feedback
 
