@@ -26,7 +26,7 @@ Check out a demo of the dashboard: [Meetup Analytics NoSQL Dashboard](http://mee
 * Extract the Neo4j store files located in `neo4j/datastore.zip` to your Neo4j data directory `neo4j/data`
 * Start the Neo4j server at `http://localhost:7474`
 * From the terminal, go to the `api` directory of this project and type `npm install`, after `node_modules` are installed, type `node app`. The analytics REST API will be started at `http://localhost:3000`
-* From the terminal, go to the `dashboard` directory of this project and type `npm install`, after `node_modules` are installed, type `node app`. The analytics REST API will be started at `http://localhost:5000`
+* From the terminal, go to the `dashboard` directory of this project and type `npm install`, after `node_modules` are installed, type `node app`. The analytics dashboard will be started at `http://localhost:5000`
 
 ### Specifications
 
