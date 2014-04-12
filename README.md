@@ -21,7 +21,7 @@ Check out a demo of the dashboard: [Meetup Analytics NoSQL Dashboard](http://mee
 * Installed `node.js` and `npm` on your machine
 * Windows Azure account with Scheduler Preview activated [http://www.windowsazure.com](http://www.windowsazure.com)
 
-### Usage
+### Setup
 
 * Extract the Neo4j store files located in `neo4j/data.zip` to your Neo4j data directory `neo4j/data`
 * Start the Neo4j server at `http://localhost:7474`
