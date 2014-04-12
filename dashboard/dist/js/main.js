@@ -26,7 +26,7 @@ $(function () {
         prefetch: {
             // url points to a json file that contains an array of country names, see
             // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
-            url: 'http://meetup-analytics-api.herokuapp.com/api/v0/analytics/countries?api_key=special-key&neo4j=true&cache=no',
+            url: 'http://localhost:3000/api/v0/analytics/countries?api_key=special-key&neo4j=true&cache=no',
             // the json file contains an array of strings, but the Bloodhound
             // suggestion engine expects JavaScript objects so this converts all of
             // those strings
@@ -50,7 +50,7 @@ $(function () {
         prefetch: {
             // url points to a json file that contains an array of country names, see
             // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
-            url: 'http://meetup-analytics-api.herokuapp.com/api/v0/analytics/cities?api_key=special-key&neo4j=true&cache=no',
+            url: 'http://localhost:3000/api/v0/analytics/cities?api_key=special-key&neo4j=true&cache=no',
             // the json file contains an array of strings, but the Bloodhound
             // suggestion engine expects JavaScript objects so this converts all of
             // those strings
@@ -462,7 +462,7 @@ function monthDiff(d1, d2) {
 }
 
 var getReport = function (from, to) {
-    $.getJSON("http://meetup-analytics-api.herokuapp.com/api/v0/analytics/monthlygrowth?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+    $.getJSON("http://localhost:3000/api/v0/analytics/monthlygrowth?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
         var table = $(".table-result-view tbody");
 
         $(table).empty();
