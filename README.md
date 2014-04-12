@@ -12,8 +12,8 @@ The main components of the archiecture include:
 ### Prerequisites
 
 * An instance of Neo4j(>=2.0) running locally - [http://www.neo4j.org/download](http://www.neo4j.org/download_thanks?edition=community&release=2.1.0-M01)
-* Microsoft Visual Studio (>=2012) for data import services. (Not required for running dashboard)
-* A Meetup.com API Key for data import services - [http://api.meetup.com/]
+* Microsoft Visual Studio (>=2012) for data import services. (Not required for running the dashboard)
+* A Meetup.com API Key for data import services - [http://api.meetup.com/](http://api.meetup.com/)
 
 ### Usage
 
@@ -25,6 +25,6 @@ The main components of the archiecture include:
 
 ### Project Outline
 
-You can find the project specifications as a [GraphGist project](http://gist.neo4j.org]))app at [Neo4j for Graph Analytics Part I: Meetup Analytics](http://gist.neo4j.org/?e2e0e4469917729765fe)
+You can find the project specifications as a [GraphGist project](http://gist.neo4j.org]) app at [Neo4j for Graph Analytics Part I: Meetup Analytics](http://gist.neo4j.org/?e2e0e4469917729765fe)
 
 ![Meetup Analytics Dashboard](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/specifications/Images/Meetup%20Analytics%20Dashboard%20-%20Screen.png)
