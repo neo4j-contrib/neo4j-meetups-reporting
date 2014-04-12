@@ -22,7 +22,7 @@
     "node": "0.10.x"
   },
   "dependencies": {
-    "connect": ">= 1.8.x"
+    "express": ">= 4.0.x"
   },
   "license": "MIT",
   "readmeFilename": "README.md",
