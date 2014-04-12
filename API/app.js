@@ -9,7 +9,6 @@ var express     = require('express')
   , PORT        = process.env.PORT || 3000
   , API_STRING  = '/api/v0'
   , BASE_URL    = process.env.BASE_URL || process.env.BASE_CALLBACK_URL || "http://localhost:"+PORT
-  //process.env.BASE_URL || process.env.BASE_CALLBACK_URL || "http://localhost:"+PORT
   , app         = express()
   , subpath     = express();
 
@@ -69,6 +68,8 @@ var models = require("./models/swagger_models");
 swagger.addModels(models)
   .addGet(routes.analytics.getWeeklyGrowthPercent)
   .addGet(routes.analytics.getMonthlyGrowthPercent)
+  .addGet(routes.analytics.getCities)
+  .addGet(routes.analytics.getCountries)
 
 
 // Configures the app's base path and api version.

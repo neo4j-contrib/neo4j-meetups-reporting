@@ -109,8 +109,8 @@ exports.getMonthlyGrowthPercent = {
     var endDate = parseUrl(req, 'endDate');
     var location = parseUrl(req, 'city');
     var country = parseUrl(req, 'country');
-    var topics = _.invoke(parseUrl(req, 'topics').split(','), 'trim');
-    var groups = parseUrl(req, 'groups') ? _.invoke(parseUrl(req, 'groups').split(','), 'trim') : [];
+    var topics = _.invoke(parseUrl(req, 'topics').toLowerCase().split(','), 'trim');
+    var groups = parseUrl(req, 'groups') ? _.invoke(parseUrl(req, 'groups').toLowerCase().split(','), 'trim') : [];
     
     var dateFrom = new Date(startDate);
     var dateTo = new Date(endDate);
@@ -127,6 +127,56 @@ exports.getMonthlyGrowthPercent = {
     var start = new Date();
     Analytics.getMonthlyGrowthPercent(params, options, function (err, response) {
       if (err || !response.results) throw swe.notFound('analytics');
+      writeResponse(res, response, start);
+    });
+  }
+};
+
+exports.getCities = {
+  'spec': {
+    "description" : "Get a list of cities that meetup groups reside in.",
+    "path" : "/analytics/cities",
+    "notes" : "Returns a distinct list of cities for typeahead.",
+    "summary" : "Gets a distinct list of cities that a meetup group resides in.",
+    "method": "GET",
+    "params" :  [],
+    "responseClass" : "List[City]",
+    "errorResponses" : [],
+    "nickname" : "getCities"
+  },
+  'action': function (req, res) {
+    var options = {
+      neo4j: parseBool(req, 'neo4j')
+    };
+
+    var start = new Date();
+    Analytics.getCities({}, options, function (err, response) {
+      if (err || !response.results) throw swe.notFound('city');
+      writeResponse(res, response, start);
+    });
+  }
+};
+
+exports.getCountries = {
+  'spec': {
+    "description" : "Get a list of countries that meetup groups reside in.",
+    "path" : "/analytics/countries",
+    "notes" : "Returns a distinct list of countries for typeahead.",
+    "summary" : "Gets a distinct list of countries that a meetup group resides in.",
+    "method": "GET",
+    "params" :  [],
+    "responseClass" : "List[City]",
+    "errorResponses" : [],
+    "nickname" : "getCountries"
+  },
+  'action': function (req, res) {
+    var options = {
+      neo4j: parseBool(req, 'neo4j')
+    };
+
+    var start = new Date();
+    Analytics.getCountries({}, options, function (err, response) {
+      if (err || !response.results) throw swe.notFound('city');
       writeResponse(res, response, start);
     });
   }

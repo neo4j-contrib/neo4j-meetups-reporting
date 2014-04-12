@@ -16,6 +16,32 @@ var randomName = require('random-name');
  *  to be combined with queries using _.partial()
  */
 
+ var _cities = function(results, callback) {
+  var citiesArray = [];
+
+  var cities = _.map(results, function (result) {
+  var thisCities = {};
+    thisCities.city = result.city;
+    citiesArray.push(result.city);
+    return thisCities;
+  });
+
+  callback(null, citiesArray);
+};
+
+ var _countries = function(results, callback) {
+  var countriesArray = [];
+
+  var countries = _.map(results, function (result) {
+  var thisCountries = {};
+    thisCountries.country = result.country;
+    countriesArray.push(result.country);
+    return thisCountries;
+  });
+
+  callback(null, countriesArray);
+};
+
 var _weeklyGrowthStatistics = function (results, callback) {
   var analytics = _.map(results, function (result) {
     var thisAnalytics = {};
@@ -101,6 +127,27 @@ var _getMonthlyGrowthPercent = function (params, options, callback) {
   callback(null, query, cypher_params);
 };
 
+var _getCities = function (params, options, callback) {
+
+  var query = [
+    'MATCH (location:Location)',
+    'RETURN DISTINCT location.city as city'
+  ].join('\n');
+
+  callback(null, query, params);
+};
+
+var _getCountries = function (params, options, callback) {
+
+  var query = [
+    'MATCH (location:Location)',
+    'RETURN DISTINCT location.country as country'
+  ].join('\n');
+
+  callback(null, query, params);
+};
+
+
 /**
  *  Result Function Wrappers
  *  a wrapper function that combines both the result functions with query functions
@@ -108,11 +155,15 @@ var _getMonthlyGrowthPercent = function (params, options, callback) {
 
 var getWeeklyGrowthPercent = Cypher(_getWeeklyGrowthPercent, _weeklyGrowthStatistics);
 var getMonthlyGrowthPercent = Cypher(_getMonthlyGrowthPercent, _monthlyGrowthStatistics);
+var getCities = Cypher(_getCities, _cities);
+var getCountries = Cypher(_getCountries, _countries);
 
 // export exposed functions
 module.exports = {
   getWeeklyGrowthPercent: getWeeklyGrowthPercent,
-  getMonthlyGrowthPercent: getMonthlyGrowthPercent
+  getMonthlyGrowthPercent: getMonthlyGrowthPercent,
+  getCities: getCities,
+  getCountries: getCountries
 };
 
 function getTicks(dateTime)

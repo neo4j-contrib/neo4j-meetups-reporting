@@ -2,7 +2,7 @@
 
 
 var neo4j = require('neo4j'),
-    db = new neo4j.GraphDatabase('http://neo4jcommunity.cloudapp.net:7474/'),
+    db = new neo4j.GraphDatabase('http://localhost:7474/'),
     _ = require('underscore')
 ;
 

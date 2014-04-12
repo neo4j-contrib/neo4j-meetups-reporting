@@ -25,6 +25,17 @@
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/jstat.js"></script>
+    <script src="./js/numeral.js"></script>
+    <script src="./js/typeahead.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/highcharts-more.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+    <script src="./js/main.js"></script>
   </head>
 
   <body>
@@ -86,17 +97,19 @@
                   </div>
                   <div class="col-md-3">
                     <div class="panel panel-default">
-            <div class="panel-heading">Location</div>
+            <div class="panel-heading heading-location">Location</div>
             <div class="panel-body">
               <div class="form-group">
           <div class="input-group">
                         <div class="btn-group btn-group-justified">
                         <div class="btn-group">
-                          <button type="button" class="btn btn-default">City</button>
+                          <button type="button" class="btn btn-default meetup-location-btn">City</button>
+
                         </div>
                         <div class="btn-group">
-                          <button type="button" class="btn btn-default">Country</button>
+                          <button type="button" class="btn btn-default meetup-location-btn selected">Country</button>
                         </div>
+                        <input type="hidden" id="meetup-location" value="country">
                       </div>
                     </div>
                   </div>
@@ -104,13 +117,13 @@
                     <div class="input-group">
 
                         <span class="input-group-addon">@</span>
-                        <input type="text" class="form-control group-location" placeholder="City" value="San Francisco">
+                        <input type="text" id="location" class="form-control group-location typeahead" value="US">
                       </div>
                     </div>
                   </div>
                 </div>
                   </div>
-                  <div class="col-md-3">
+                  <!-- <div class="col-md-3">
                     <div class="panel panel-default">
             <div class="panel-heading">Granularity</div>
             <div class="panel-body">
@@ -129,8 +142,8 @@
 
                   </div>
                 </div>
-                  </div>
-                   <div class="col-md-3">
+                  </div> -->
+                   <div class="col-md-6">
                     <div class="panel panel-default">
             <div class="panel-heading">Tags</div>
             <div class="panel-body">
@@ -138,7 +151,7 @@
                     <div class="input-group">
 
                         <span class="input-group-addon">#</span>
-                        <input type="text" class="form-control group-tags" placeholder="Tags" value="NoSQL">
+                        <input type="text" class="form-control group-tags" placeholder="Tags" value="Neo4j">
                       </div>
                     </div>
                   </div>
@@ -149,7 +162,7 @@
                 </div>
 <div class="panel panel-default">
   <div class="panel-body">
-            <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+            <div id="container" style="min-width: 350px; height: 500px; margin: 0 auto"></div>
           </div>
         </div>
               
@@ -178,15 +191,7 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
-    <script src="//code.jquery.com/jquery-1.9.1.js"></script>
-    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-    <script src="./js/bootstrap.min.js"></script>
-    <script src="./js/jstat.js"></script>
-    <script src="./js/numeral.js"></script>
-    <script src="http://code.highcharts.com/highcharts.js"></script>
-    <script src="http://code.highcharts.com/modules/exporting.js"></script>
-    <script src="./js/main.js"></script>
+    
 
   </body>
 </html>
