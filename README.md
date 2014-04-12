@@ -1,4 +1,4 @@
-# Graph Database Analytics Platform
+# Graph-based Meetup.com Analytics Platform
 
 A graph-based analytics platform to track and measure meetup.com groups growth over time. Identify community trends and see what people are meeting about in the world. 
 
