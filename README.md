@@ -2,7 +2,7 @@
 
 A graph-based analytics platform to track and measure meetup.com groups growth over time. Identify community trends and see what people are meeting about in the world. 
 
-![Meetup Analytics Dashboard](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/Images/Meetup%20Analytics%20Dashboard%20-%20Screen.png)
+![Meetup Analytics Dashboard](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/Meetup%20Analytics%20Dashboard%20-%20Screen.png)
 
 Check out a demo of the dashboard: [Meetup Analytics NoSQL Dashboard](http://meetup-analytics-dashboard.herokuapp.com/)
 
