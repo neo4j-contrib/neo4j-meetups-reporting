@@ -68,6 +68,7 @@ var models = require("./models/swagger_models");
 swagger.addModels(models)
   .addGet(routes.analytics.getWeeklyGrowthPercent)
   .addGet(routes.analytics.getMonthlyGrowthPercent)
+  .addGet(routes.analytics.getMonthlyGrowthPercentByTag)
   .addGet(routes.analytics.getCities)
   .addGet(routes.analytics.getCountries)
 

@@ -66,6 +66,18 @@ var _monthlyGrowthStatistics = function (results, callback) {
   callback(null, analytics);
 };
 
+var _monthlyGrowthStatisticsByTag = function (results, callback) {
+  var analytics = _.map(results, function (result) {
+    var thisAnalytics = {};
+    thisAnalytics.month = result.month;
+    thisAnalytics.tag = result.tag;
+    thisAnalytics.members = result.members;
+    return thisAnalytics;
+  });
+
+  callback(null, analytics);
+};
+
 /**
  *  Query Functions
  *  to be combined with result functions using _.partial()
@@ -126,6 +138,33 @@ var _getMonthlyGrowthPercent = function (params, options, callback) {
   callback(null, query, cypher_params);
 };
 
+var _getMonthlyGrowthPercentByTag = function (params, options, callback) {
+  var cypher_params = {
+    startDate: getTicks(params.startDate),
+    endDate: getTicks(params.endDate),
+    city: params.city,
+    country: params.country,
+    topics: params.topics,
+    groups: params.groups
+  };
+  var query = [
+    'MATCH (d:Day)<-[:HAS_DAY]-(month:Month)',
+    'WHERE d.timestamp > { startDate } AND d.timestamp < { endDate }',
+    'WITH DISTINCT month',
+    'MATCH (month:Month)-[:HAS_DAY]->(day:Day { day: 1 })',
+    'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
+    'WHERE tag.tag in { topics }',
+    'WITH tag, location, day',
+    'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag',
+    'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as month, tag.tag as tag, sum(stats.count) as members, day',
+    'ORDER BY day.timestamp',
+    'RETURN month, tag, members'
+  ].join('\n');
+
+  callback(null, query, cypher_params);
+};
+
 var _getCities = function (params, options, callback) {
 
   var query = [
@@ -154,6 +193,7 @@ var _getCountries = function (params, options, callback) {
 
 var getWeeklyGrowthPercent = Cypher(_getWeeklyGrowthPercent, _weeklyGrowthStatistics);
 var getMonthlyGrowthPercent = Cypher(_getMonthlyGrowthPercent, _monthlyGrowthStatistics);
+var getMonthlyGrowthPercentByTag = Cypher(_getMonthlyGrowthPercentByTag, _monthlyGrowthStatisticsByTag);
 var getCities = Cypher(_getCities, _cities);
 var getCountries = Cypher(_getCountries, _countries);
 
@@ -161,6 +201,7 @@ var getCountries = Cypher(_getCountries, _countries);
 module.exports = {
   getWeeklyGrowthPercent: getWeeklyGrowthPercent,
   getMonthlyGrowthPercent: getMonthlyGrowthPercent,
+  getMonthlyGrowthPercentByTag: getMonthlyGrowthPercentByTag,
   getCities: getCities,
   getCountries: getCountries
 };

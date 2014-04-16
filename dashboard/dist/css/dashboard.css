@@ -12,9 +12,14 @@ text {
   font-family: 'Open Sans', sans-serif !important;
 }
 
+.donut-chart text
+{
+  font-size: 10px !important;
+}
+
 .main
 {
-  max-width: 83em;
+  max-width: 70em;
 }
 
 .meetup-location-btn.selected

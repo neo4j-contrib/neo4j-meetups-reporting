@@ -75,23 +75,22 @@ $(function () {
 });
 
 function onOpened($e) {
-    console.log('opened');
+
 }
 
 function onAutocompleted($e, datum) {
-    getReport($("#from").val(), $("#to").val());
+    getTagReport($("#from").val(), $("#to").val());
+    //getGroupReport($("#from").val(), $("#to").val());
 }
 
 function onSelected($e, datum) {
-    console.log('selected');
-    console.log(datum);
+
 }
 
 $(function () {
 
     Highcharts.theme = {
-        colors: ["#338529", "#f68709", "#37c89a", "#6c7093", "#2dd2a6", "#ff0066", "#5ba483",
-            "#f60940", "#dc6faf", "#c7c043", "#b6f7a6"
+        colors: ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"
         ],
         chart: {
             backgroundColor: {
@@ -397,15 +396,15 @@ $(function () {
         $(this).addClass("selected");
         $(".group-location").val("");
         $(".group-location").attr("placeholder", $(this).text());
-
-        initTypeahead($(this).text() == "City" ? cities : countries);
+        initTypeahead($(this).text().trim() == "City" ? cities : countries);
     });
 
     $(".group-location, .group-tags").keypress(function (event) {
         if (event.which == 13) {
             event.preventDefault();
 
-            getReport($("#from").val(), $("#to").val());
+            getTagReport($("#from").val(), $("#to").val());
+            //getGroupReport($("#from").val(), $("#to").val());
         }
     });
 
@@ -434,11 +433,13 @@ $(function () {
         onClose: function (selectedDate) {
             $("#from").datepicker("option", "maxDate", selectedDate);
             // Generate report
-            getReport($("#from").val(), $("#to").val());
+            getTagReport($("#from").val(), $("#to").val());
+            //getGroupReport($("#from").val(), $("#to").val());
         }
     });
 
-    getReport($("#from").val(), $("#to").val());
+    getTagReport($("#from").val(), $("#to").val());
+    //getGroupReport($("#from").val(), $("#to").val());
 });
 
 Array.prototype.getUnique = function () {
@@ -461,15 +462,14 @@ function monthDiff(d1, d2) {
     return months <= 0 ? 0 : months;
 }
 
-var getReport = function (from, to) {
-    $.getJSON("http://localhost:3000/api/v0/analytics/monthlygrowth?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
-        var table = $(".table-result-view tbody");
+var getGroupReport = function (from, to) {
+    $.getJSON("http://localhost:3000/api/v0/analytics/monthlygrowth?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+        var table = $(".table-result-view-group tbody");
 
         $(table).empty();
 
         // Get months between the dates
         var monthCount = monthDiff(new Date(from), new Date(to));
-        console.log(monthCount);
 
         var categories = [];
         var series = [];
@@ -504,6 +504,8 @@ var getReport = function (from, to) {
                 };
             });
 
+
+
             series.push({
                 name: item,
                 data: dataPoints
@@ -530,25 +532,177 @@ var getReport = function (from, to) {
             table.append(items.join());
         });
 
-        buildChart(categories, series);
+        buildGroupChart(categories, series);
     });
 };
 
-var buildChart = function (categories, series) {
-    $(series).each(function (i, item) {
-        item.fillColor = {
-            linearGradient: [0, 0, 0, 300],
-            stops: [
-                [0, "#4572A7"],
-                [1, "rgba(2,0,0,0)"]
-            ]
-        };
-    });
+var getTagReport = function (from, to) {
+    $.getJSON("http://localhost:3000/api/v0/analytics/monthlygrowthbytag?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+        var table = $(".table-result-view-tag tbody");
 
-    console.log(series);
+        $(table).empty();
+
+        // Get months between the dates
+        var monthCount = monthDiff(new Date(from), new Date(to));
+        var categories = [];
+        var series = [];
+        var seriesVariance = [];
+
+        // Collect unique dates for categories
+        var categoryArr = [];
+        var seriesName = [];
+
+        $.each(data, function (key, val) {
+            categoryArr.push(val.month);
+            seriesName.push(val.tag);
+        });
+
+        categories = categoryArr.getUnique();
+        var names = seriesName.getUnique();
+
+        $.each(names, function (i, item) {
+            var dataPoints = [];
+            var dataPointValues = [];
+
+
+            $.each(data, function (key, val) {
+                if (val.tag == item) {
+                    dataPointsArr = [];
+                    var thisDateTime = new Date(val.month);
+                    var utcDateTime = Date.UTC(thisDateTime.getUTCFullYear(), thisDateTime.getUTCMonth(), thisDateTime.getUTCDate());
+                    dataPointsArr.push(utcDateTime);
+                    dataPointsArr.push(val.members);
+                    dataPoints.push(dataPointsArr);
+                    dataPointValues.push(val.members);
+                };
+            });
+
+            var dataPointPercent = [];
+            
+            for (var j = 0; j < dataPoints.length; j++) {
+                if (j > 0) 
+                {
+                    var min = dataPoints[j - 1][1];
+                    var max = dataPoints[j][1];
+                    dataPointPercent.push([dataPoints[j][0], ((max - min) / min).toFixed(2) * 100]);
+                }
+            }
+
+            series.push({
+                name: item,
+                data: dataPointPercent
+            })
+
+            // Only measure annual percent growth for groups older than a year
+          
+                seriesVariance.push({
+                    name: item,
+                    data: (jStat(dataPointValues).max() - jStat(dataPointValues).min()) / jStat([jStat(dataPointValues).min(), 1]).max()
+                });
+            
+        });
+
+        seriesVariance.sort(function (a, b) {
+            return b.data - a.data
+        });
+
+        $.each(seriesVariance, function (key, val) {
+            var items = [];
+            items.push("<tr><td>" + val.name + "</td>");
+            items.push("<td>" + numeral(val.data).format('0%') + "</td>");
+            items.push("</tr>");
+            table.append(items.join());
+        });
+
+        
+
+        buildTagChart(categories, series);        
+        $(".donut-chart").empty();
+        buildDonutChart(seriesVariance);
+
+        var barSeries = [];
+        var arcSeries = [];
+        // Build line chart
+        $(series).each(function(key, val){
+            var item = {};
+            item.name = val.name;
+            item.data = [];
+            item.data.push(jStat(val.data.map(function(d) { return d[1]; })).sum());
+            barSeries.push(item);
+        });
+
+        $(series).each(function(key, val){
+            var item = [];
+            item.push(val.name);
+            item.push(jStat(val.data.map(function(d) { return d[1]; })).sum());
+            arcSeries.push(item);
+        });
+
+        buildBarChart(barSeries);
+        buildArcChart(arcSeries);
+    });
+};
+
+var buildTagChart= function (categories, series) {
+
     var chartOptions = {
         chart: {
-            renderTo: 'container',
+            renderTo: 'tag-container',
+            type: 'line'
+        },
+        title: {
+            text: 'Meetup Tag Growth % in ' + document.getElementById("location").value,
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            x: 0,
+            y: 100
+        },
+        subtitle: {
+            text: 'Meetup.com data'
+        },
+        plotOptions: {
+            series: {
+                lineWidth: 2
+            }
+        },
+        xAxis: {
+            type: 'datetime',
+            dateTimeLabelFormats: { // don't display the dummy year
+                month: '%b %y',
+                year: '%y',
+                day: '%d'
+            }
+        },
+        yAxis: {
+            title: {
+                text: '% Growth'
+            },
+            min: 0,
+            gridLineColor: '#DDDDDD'
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.series.name + '</b><br/>' +
+                    Highcharts.dateFormat("%b '%y", this.x) + ': ' + this.y.toFixed(0) + '%';
+            }
+        },
+
+        series: series
+    };
+
+    window.chart = new Highcharts.Chart(chartOptions);
+
+
+};
+
+var buildGroupChart = function (categories, series) {
+
+    var chartOptions = {
+        chart: {
+            renderTo: 'group-container',
             type: 'line'
         },
         title: {
@@ -562,7 +716,7 @@ var buildChart = function (categories, series) {
             y: 100
         },
         subtitle: {
-            text: 'Meetup.com data'
+            text: 'Source: Meetup.com'
         },
         plotOptions: {
             series: {
@@ -595,6 +749,166 @@ var buildChart = function (categories, series) {
     };
 
     window.chart = new Highcharts.Chart(chartOptions);
-
-
 };
+
+// Donut chart
+function buildDonutChart(data)
+{
+    var width = 200,
+        height = 200,
+        radius = Math.min(width, height) / 2;
+
+    var color = d3.scale.ordinal()
+        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+    var arc = d3.svg.arc()
+        .outerRadius(radius - 10)
+        .innerRadius(radius - 70);
+
+    var pie = d3.layout.pie()
+        .sort(null)
+        .value(function(d) { return d.data; });
+
+    var svg = d3.select(".donut-chart").append("svg")
+        .attr("width", width + 200)
+        .attr("height", height)
+      .append("g")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+      data.forEach(function(d) {
+        d.data = +d.data;
+      });
+
+      var g = svg.selectAll(".arc")
+          .data(pie(data))
+        .enter().append("g")
+          .attr("class", "arc");
+
+      g.append("path")
+          .attr("d", arc)
+          .style("fill", function(d) { return color(d.data.name); });
+
+
+
+          var ageNames = data.map(function(d) { return d.name; });
+     var legend = svg.selectAll(".legend")
+      .data(ageNames.slice().reverse())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + (-50 + (i * 20)) + ")"; });
+
+  legend.append("rect")
+      .attr("x", 200 - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+
+  legend.append("text")
+      .attr("x", 200 - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+
+}
+
+function buildBarChart(data)
+{
+    console.log(data); 
+        var chartOptions = {
+            chart: {
+                type: 'bar',
+                renderTo: 'bar-container'
+            },
+            title: {
+                text: 'Cumulative Meetup Growth'
+            },
+            subtitle: {
+                text: 'Source: Meetup.com'
+            },
+            xAxis: {
+                categories: ['NoSQL'],
+                title: {
+                    text: null
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Growth (%)',
+                    align: 'high'
+                },
+                labels: {
+                    overflow: 'justify'
+                }
+            },
+            tooltip: {
+                valueSuffix: ' %'
+            },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true
+                    }
+                }
+            },
+            legend: {
+                layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            x: 0,
+            y: 100
+            },
+            credits: {
+                enabled: false
+            },
+            series: data
+        };
+
+        window.chart = new Highcharts.Chart(chartOptions);
+}
+
+function buildArcChart(data)
+{
+    var chartOptions = {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: 0,
+            plotShadow: false,
+            renderTo: 'arc-container'
+        },
+        title: {
+            text: 'Relative Growth %'
+        },
+            subtitle: {
+                text: 'Source: Meetup.com'
+            },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            x: 0,
+            y: 100
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: true
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'Cumulative Growth',
+            innerSize: '20%',
+            data: data
+        }]
+    }
+    window.chart = new Highcharts.Chart(chartOptions);
+}
