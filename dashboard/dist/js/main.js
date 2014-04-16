@@ -395,7 +395,7 @@ $(function () {
         $(".meetup-location-btn").removeClass("selected");
         $(this).addClass("selected");
         $(".group-location").val("");
-        $(".group-location").attr("placeholder", $(this).text());
+        $(".group-location").attr("placeholder", $(this).text().trim());
         initTypeahead($(this).text().trim() == "City" ? cities : countries);
     });
 
@@ -618,7 +618,6 @@ var getTagReport = function (from, to) {
 
         buildTagChart(categories, series);        
         $(".donut-chart").empty();
-        buildDonutChart(seriesVariance);
 
         var barSeries = [];
         var arcSeries = [];
@@ -639,8 +638,22 @@ var getTagReport = function (from, to) {
         });
 
         buildBarChart(barSeries);
-        buildArcChart(arcSeries);
+        buildArcChart(arcSeries, 'arc-container', 'Relative Growth %', 'Cumulative Growth', '{series.name}: <b>{point.percentage:.1f}%</b>');
     });
+
+  $.getJSON("http://localhost:3000/api/v0/analytics/groupsbytag?" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&tags=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+        var arcSeries = [];
+        $(data).each(function(key, val){
+            var item = [];
+            item.push(val.tag);
+            item.push(val.count);
+            arcSeries.push(item);
+        });
+
+        console.log(arcSeries);
+
+        buildArcChart(arcSeries, "tag-count-container", 'Groups By Tag', 'Groups', '{series.name}: <b>{point.y}</b>');
+  });
 };
 
 var buildTagChart= function (categories, series) {
@@ -751,67 +764,6 @@ var buildGroupChart = function (categories, series) {
     window.chart = new Highcharts.Chart(chartOptions);
 };
 
-// Donut chart
-function buildDonutChart(data)
-{
-    var width = 200,
-        height = 200,
-        radius = Math.min(width, height) / 2;
-
-    var color = d3.scale.ordinal()
-        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-
-    var arc = d3.svg.arc()
-        .outerRadius(radius - 10)
-        .innerRadius(radius - 70);
-
-    var pie = d3.layout.pie()
-        .sort(null)
-        .value(function(d) { return d.data; });
-
-    var svg = d3.select(".donut-chart").append("svg")
-        .attr("width", width + 200)
-        .attr("height", height)
-      .append("g")
-        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-      data.forEach(function(d) {
-        d.data = +d.data;
-      });
-
-      var g = svg.selectAll(".arc")
-          .data(pie(data))
-        .enter().append("g")
-          .attr("class", "arc");
-
-      g.append("path")
-          .attr("d", arc)
-          .style("fill", function(d) { return color(d.data.name); });
-
-
-
-          var ageNames = data.map(function(d) { return d.name; });
-     var legend = svg.selectAll(".legend")
-      .data(ageNames.slice().reverse())
-    .enter().append("g")
-      .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + (-50 + (i * 20)) + ")"; });
-
-  legend.append("rect")
-      .attr("x", 200 - 18)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style("fill", color);
-
-  legend.append("text")
-      .attr("x", 200 - 24)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .style("text-anchor", "end")
-      .text(function(d) { return d; });
-
-}
-
 function buildBarChart(data)
 {
     console.log(data); 
@@ -868,17 +820,17 @@ function buildBarChart(data)
         window.chart = new Highcharts.Chart(chartOptions);
 }
 
-function buildArcChart(data)
+function buildArcChart(data, target, text, name, pointFormat)
 {
     var chartOptions = {
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: 0,
             plotShadow: false,
-            renderTo: 'arc-container'
+            renderTo: target
         },
         title: {
-            text: 'Relative Growth %'
+            text: text
         },
             subtitle: {
                 text: 'Source: Meetup.com'
@@ -891,7 +843,7 @@ function buildArcChart(data)
             y: 100
         },
         tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            pointFormat: pointFormat
         },
         plotOptions: {
             pie: {
@@ -905,7 +857,7 @@ function buildArcChart(data)
         },
         series: [{
             type: 'pie',
-            name: 'Cumulative Growth',
+            name: name,
             innerSize: '20%',
             data: data
         }]

@@ -78,6 +78,20 @@ var _monthlyGrowthStatisticsByTag = function (results, callback) {
   callback(null, analytics);
 };
 
+var _groupCountByTag = function(results, callback) {
+  var tagCountArray = [];
+
+  var tags = _.map(results, function (result) {
+  var thisTags = {};
+    thisTags.tag = result.tag;
+    thisTags.count = result.count;
+    tagCountArray.push(thisTags);
+    return thisTags;
+  });
+
+  callback(null, tagCountArray);
+};
+
 /**
  *  Query Functions
  *  to be combined with result functions using _.partial()
@@ -165,6 +179,18 @@ var _getMonthlyGrowthPercentByTag = function (params, options, callback) {
   callback(null, query, cypher_params);
 };
 
+var _getGroupsByTag = function (params, options, callback) {
+
+  var query = [
+    'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
+    'WHERE tag.tag in { tags }',
+    'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location)',
+    'RETURN tag.tag as tag, count(group) as count'
+  ].join('\n');
+
+  callback(null, query, params);
+};
+
 var _getCities = function (params, options, callback) {
 
   var query = [
@@ -196,6 +222,7 @@ var getMonthlyGrowthPercent = Cypher(_getMonthlyGrowthPercent, _monthlyGrowthSta
 var getMonthlyGrowthPercentByTag = Cypher(_getMonthlyGrowthPercentByTag, _monthlyGrowthStatisticsByTag);
 var getCities = Cypher(_getCities, _cities);
 var getCountries = Cypher(_getCountries, _countries);
+var getGroupCountByTag = Cypher(_getGroupsByTag, _groupCountByTag);
 
 // export exposed functions
 module.exports = {
@@ -203,7 +230,8 @@ module.exports = {
   getMonthlyGrowthPercent: getMonthlyGrowthPercent,
   getMonthlyGrowthPercentByTag: getMonthlyGrowthPercentByTag,
   getCities: getCities,
-  getCountries: getCountries
+  getCountries: getCountries,
+  getGroupCountByTag: getGroupCountByTag
 };
 
 function getTicks(dateTime)

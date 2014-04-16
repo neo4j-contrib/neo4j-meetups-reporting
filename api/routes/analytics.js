@@ -183,6 +183,44 @@ exports.getMonthlyGrowthPercentByTag = {
   }
 };
 
+exports.getGroupCountByTag = {
+  'spec': {
+    "description" : "Get a count of groups by tag.",
+    "path" : "/analytics/groupsbytag",
+    "notes" : "Returns a list of tags and the number of groups per tag.",
+    "summary" : "Gets list of tags and the number of groups per tag.",
+    "method": "GET",
+    "params" :  [param.query("tags", "A list of tags that a meetup group must have to be returned in the result set. Multiple tag names should be delimited by a comma.", "string", true, true),
+    param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+      param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true)],
+    "responseClass" : "List[Tag]",
+    "errorResponses" : [],
+    "nickname" : "getGroupCountByTag"
+  },
+  'action': function (req, res) {
+    var options = {
+      neo4j: parseBool(req, 'neo4j')
+    };
+
+    var tags = _.invoke(parseUrl(req, 'tags').toLowerCase().split(','), 'trim');
+    var location = parseUrl(req, 'city');
+    var country = parseUrl(req, 'country');
+
+    var params = {
+      tags: tags,
+      city: location,
+      country: country
+    };
+
+    var start = new Date();
+    Analytics.getGroupCountByTag(params, options, function (err, response) {
+      if (err || !response.results) throw swe.notFound('city');
+      writeResponse(res, response, start);
+    });
+  }
+};
+
+
 exports.getCities = {
   'spec': {
     "description" : "Get a list of cities that meetup groups reside in.",
