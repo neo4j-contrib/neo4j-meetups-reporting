@@ -12,6 +12,27 @@ text {
   font-family: 'Open Sans', sans-serif !important;
 }
 
+.ui-widget
+{
+  font-family: 'Open Sans', sans-serif !important;
+}
+
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button
+{
+  font-family: 'Open Sans', sans-serif !important;
+}
+
+.growth-table-city
+{
+  width: 50%;
+  padding-left: 1em !important;
+}
+
+.panel-default > .panel-heading
+{
+  font-weight: bold;
+}
+
 .donut-chart text
 {
   font-size: 10px !important;

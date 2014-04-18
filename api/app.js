@@ -72,6 +72,7 @@ swagger.addModels(models)
   .addGet(routes.analytics.getCities)
   .addGet(routes.analytics.getCountries)
   .addGet(routes.analytics.getGroupCountByTag)
+  .addGet(routes.analytics.getMonthlyGrowthPercentByLocation)
 
 
 // Configures the app's base path and api version.
