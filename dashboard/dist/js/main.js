@@ -90,7 +90,7 @@ function onSelected($e, datum) {
 $(function () {
 
     Highcharts.theme = {
-        colors: ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"
+        colors: ["#F25A29", "#AD62CE", "#30B6AF", "#FCC940", "#FF6C7C", "#4356C0", "#DFE1E3"
         ],
         chart: {
             backgroundColor: {
@@ -649,9 +649,6 @@ var getTagReport = function (from, to) {
             item.push(val.count);
             arcSeries.push(item);
         });
-
-        console.log(arcSeries);
-
         buildArcChart(arcSeries, "tag-count-container", 'Groups By Tag', 'Groups', '{series.name}: <b>{point.y}</b>');
   });
 };
@@ -766,7 +763,6 @@ var buildGroupChart = function (categories, series) {
 
 function buildBarChart(data)
 {
-    console.log(data); 
         var chartOptions = {
             chart: {
                 type: 'bar',

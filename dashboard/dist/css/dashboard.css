@@ -22,6 +22,11 @@ text {
   max-width: 83em;
 }
 
+.tag-caption {
+    color: #999999;
+    padding: 0.5em 0 0;
+}
+
 .meetup-location-btn.selected
 {
   background-color: #E0393E !important;
