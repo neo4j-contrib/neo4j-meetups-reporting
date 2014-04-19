@@ -10,13 +10,12 @@ Check out a demo of the dashboard: [Meetup Analytics NoSQL Dashboard](http://mee
 
 * Front-end web-based dashboard in Node.js and bootstrap
 * REST API via Neo4j Swagger in Node.js
-* Data import services in .NET C#
+* Data import services in Node.js
 * Data storage in Neo4j graph database
 
 ### Prerequisites
 
 * An instance of Neo4j (`>=2.1`) running locally - [http://www.neo4j.org/download](http://www.neo4j.org/download_thanks?edition=community&release=2.1.0-M01)
-* Microsoft Visual Studio (`>=2012`) for running data import services. (Not required for testing the dashboard)
 * A Meetup.com API Key for running data import services - [http://www.meetup.com/meetup_api/](http://www.meetup.com/meetup_api/)
 * Installed `node.js` and `npm` on your machine
 
