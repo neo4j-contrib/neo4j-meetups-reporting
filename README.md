@@ -22,10 +22,21 @@ Check out a demo of the dashboard: [Meetup Analytics NoSQL Dashboard](http://mee
 
 ### Usage
 
+Follow the directions below for each component of the platform.
+
+#### Database
+
 * Extract the Neo4j store files located in `neo4j/data.zip` to your Neo4j data directory `neo4j/data`
 * Start the Neo4j server at `http://localhost:7474`
+
+#### REST API
+
 * From the terminal, go to the `api` directory of the project and run `npm install`, after `node_modules` are installed, run `node app`. The analytics REST API will be started at `http://localhost:3000`
+
+#### Analytics Dashboard
 * From the terminal, go to the `dashboard` directory of the project and run `npm install`, after `node_modules` are installed, run `node app`. The analytics dashboard will be started at `http://localhost:5000`
+
+#### Data Import Scheduler
 * From the terminal, go to the `scheduler` directory of the project and run `npm install`, after `node_modules` are installed, run `node app`. The Meetup group import scheduler will be started at `http://localhost:3001`. It will run once a day 5 minutes after midnight PST.
 
 ### Specifications
