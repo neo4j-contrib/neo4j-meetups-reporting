@@ -6,6 +6,7 @@
 body {
   padding-top: 50px;
   font-family: 'Open Sans', sans-serif !important;
+  font-size: 12px !important;
 }
 
 text {
@@ -20,6 +21,29 @@ text {
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button
 {
   font-family: 'Open Sans', sans-serif !important;
+}
+
+.loader
+{
+  background-image: url('/images/spiffygif_30x30.gif');
+  background-position: 0 10px;
+  background-repeat: no-repeat;;
+  float: left;
+  font-size: 18px;
+  height: 50px;
+  line-height: 20px;
+  padding: 15px;
+  width: 30px;
+}
+
+.btn
+{
+  font-size: 12px !important;
+}
+
+.input-group-addon
+{
+  font-size: 12px !important;
 }
 
 .growth-table-city
@@ -85,6 +109,11 @@ text {
 .nav-sidebar > .active > a {
     background-color: #E0393E !important;
     color: #FFFFFF;
+}
+
+.form-control
+{
+  font-size: 12px !important;
 }
 
 /*
@@ -232,7 +261,7 @@ text {
 }
 
 .gist {
-  font-size: 14px;
+  font-size: 12px;
 }
 
 /* example specific styles */

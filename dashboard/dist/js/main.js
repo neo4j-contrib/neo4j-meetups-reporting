@@ -115,7 +115,7 @@ $(function () {
         title: {
             style: {
                 color: '#333',
-                font: '16px "Open Sans", sans-serif'
+                font: '12px "Open Sans", sans-serif'
             }
         },
         subtitle: {
@@ -532,7 +532,9 @@ var getGroupReport = function (from, to) {
 };
 
 var getTagReport = function (from, to) {
+    $('.loader').show();
     $.getJSON("http://localhost:3000/api/v0/analytics/monthlygrowthbytag?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+        $('.loader').hide();
 
         // Get months between the dates
         var monthCount = monthDiff(new Date(from), new Date(to));
@@ -763,7 +765,7 @@ var buildTagChart= function (categories, series) {
             align: 'right',
             verticalAlign: 'top',
             x: 0,
-            y: 100
+            y: 50
         },
         subtitle: {
             text: 'Meetup.com data'
@@ -818,7 +820,7 @@ var buildGroupChart = function (categories, series) {
             align: 'right',
             verticalAlign: 'top',
             x: 0,
-            y: 100
+            y: 50
         },
         subtitle: {
             text: 'Source: Meetup.com'
@@ -900,7 +902,7 @@ function buildBarChart(data)
             align: 'right',
             verticalAlign: 'top',
             x: 0,
-            y: 100
+            y: 50
             },
             credits: {
                 enabled: false
@@ -931,7 +933,7 @@ function buildArcChart(data, target, text, name, pointFormat)
             align: 'right',
             verticalAlign: 'top',
             x: 0,
-            y: 100
+            y: 50
         },
         tooltip: {
             pointFormat: pointFormat
