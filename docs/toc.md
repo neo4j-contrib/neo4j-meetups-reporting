@@ -187,14 +187,41 @@ Returns a list of tags and the number of groups per tag.
 }
 ```
 
-
 ####### /analytics/cities
 
 Returns a distinct list of cities for typeahead.
 
+```javascript
+'spec': {
+  "description" : "Get a list of cities that meetup groups reside in.",
+  "path" : "/analytics/cities",
+  "notes" : "Returns a distinct list of cities for typeahead.",
+  "summary" : "Gets a distinct list of cities that a meetup group resides in.",
+  "method": "GET",
+  "params" :  [],
+  "responseClass" : "List[City]",
+  "errorResponses" : [],
+  "nickname" : "getCities"
+}
+```
+
 ####### /analytics/countries
 
 Returns a distinct list of countries for typeahead.
+
+```javascript
+'spec': {
+  "description" : "Get a list of countries that meetup groups reside in.",
+  "path" : "/analytics/countries",
+  "notes" : "Returns a distinct list of countries for typeahead.",
+  "summary" : "Gets a distinct list of countries that a meetup group resides in.",
+  "method": "GET",
+  "params" :  [],
+  "responseClass" : "List[City]",
+  "errorResponses" : [],
+  "nickname" : "getCountries"
+}
+```
 
 ## Dashboard
 
