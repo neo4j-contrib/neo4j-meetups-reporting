@@ -74,11 +74,11 @@ The analytics API calls are as follows:
 
 * [GetWeeklyGrowthPercent](#-analyticsweeklygrowth)
 * [GetMonthlyGrowthPercent](#-analyticsmonthlygrowth)
-* [GetMonthlyGrowthPercentByTag](#-analytics-monthlygrowthbytag)
-* [GetMonthlyGrowthPercentByLocation](#-analytics-monthlygrowthbylocation)
-* [GetGroupCountByTag](#-analytics-groupsbytag)
-* [GetCities](#-analytics-cities)
-* [GetCountries](#-analytics-countries)
+* [GetMonthlyGrowthPercentByTag](#-analyticsmonthlygrowthbytag)
+* [GetMonthlyGrowthPercentByLocation](#-analyticsmonthlygrowthbylocation)
+* [GetGroupCountByTag](#-analyticsgroupsbytag)
+* [GetCities](#-analyticscities)
+* [GetCountries](#-analyticscountries)
 
 ####### /analytics/weeklygrowth
 
