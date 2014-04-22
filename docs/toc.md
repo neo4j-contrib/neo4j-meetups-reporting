@@ -34,6 +34,21 @@ The `models/analytics.js` file contains a set of functions that are meant to man
 
 Get weekly growth percent of meetup groups as a time series.
 
+```cypher
+MATCH (d:Day)<-[:HAS_DAY]-(month:Month)
+WHERE d.timestamp > { startDate } AND d.timestamp < { endDate }
+WITH DISTINCT month
+MATCH (month:Month)-[:HAS_DAY]->(day:Day { dayofweek: 1 })
+MATCH (tag:Tag), (location:Location{ country: { country } })
+WHERE tag.tag in { topics }
+WITH tag, location, day
+MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day
+MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)
+WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as week, group.name as group, stats.count as members, day
+ORDER BY day.timestamp
+RETURN week, group, members
+```
+
 ####### getMonthlyGrowthPercent
 
 Get monthly growth percent of meetup groups as a time series.
