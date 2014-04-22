@@ -38,12 +38,19 @@ An [API key from Meetup.com](http://www.meetup.com/meetup_api/) is required for 
 
 This section covers the graph-based analytics REST API. This REST API communicates with the Neo4j graph database and exposes the database layer to the front-end web dashboard. The REST API is a fork of [Neo4j Swagger](#the-neo4j-swagger-project). [Swagger](#the-swagger-project) is a specification and complete framework implementation for describing, producing, consuming, and visualizing RESTful web services.
 
+* [Demo](#demo-1)
 * [Setup](#setup)
 * [Dependencies](#dependencies)
-* [Based On Swagger](#based-on-swagger)
+* [Swagger](#swagger)
   *  [The Swagger Project](#the-swagger-project)
   *  [The Neo4j Swagger Project](#the-neo4j-swagger-project)
 * [Project Files](#project-files)
+
+### Demo
+
+A live online demo for the REST API is located here: [http://meetup-analytics-api.herokuapp.com/docs/](http://meetup-analytics-api.herokuapp.com/docs/)
+
+![REST API demo](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/rest-api-demo.png "Analytics REST API demo")
 
 ### Setup
 
@@ -73,7 +80,7 @@ Below are the Node.js module dependencies for the analytics REST API component.
 }
 ```
 
-### Based On Swagger
+### Swagger
 
 The REST API module of this project is based on a fork of Swagger. See below for a brief summary for Swagger and its fork, Neo4j Swagger.
 
