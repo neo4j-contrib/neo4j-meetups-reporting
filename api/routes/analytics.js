@@ -242,7 +242,7 @@ exports.getGroupCountByTag = {
         "description": "Get a count of groups by tag.",
         "path": "/analytics/groupsbytag",
         "notes": "Returns a list of tags and the number of groups per tag.",
-        "summary": "Gets list of tags and the number of groups per tag.",
+        "summary": "Gets list of tags and the number of meetup groups per tag.",
         "method": "GET",
         "params": [
             param.query("tags", "A list of tags that a meetup group must have to be returned in the result set. Multiple tag names should be delimited by a comma.", "string", true, true),
