@@ -1,4 +1,4 @@
-var apiUrl = "http://meetup-analytics-api.herokuapp.com/";
+var apiUrl = "http://localhost:3000/";
 
 var locationTypeahead;
 var countries;

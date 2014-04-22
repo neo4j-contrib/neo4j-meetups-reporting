@@ -8,7 +8,7 @@ var express     = require('express')
   , routes      = require('./routes')
   , PORT        = process.env.PORT || 3000
   , API_STRING  = '/api/v0'
-  , BASE_URL    = 'http://meetup-analytics-api.herokuapp.com'
+  , BASE_URL    = process.env.BASE_URL || process.env.BASE_CALLBACK_URL || "http://localhost:"+PORT
   , app         = express()
   , subpath     = express();
 
