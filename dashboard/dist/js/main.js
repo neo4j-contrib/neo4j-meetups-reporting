@@ -81,7 +81,7 @@ function onOpened($e) {
 function onAutocompleted($e, datum) {
     getTagReport($("#from").val(), $("#to").val());
     getLocationReport($("#from").val(), $("#to").val());
-    //getGroupReport($("#from").val(), $("#to").val());
+    ////getGroupReport($("#from").val(), $("#to").val());
 }
 
 function onSelected($e, datum) {
@@ -428,6 +428,7 @@ $(function () {
             $("#to").datepicker("option", "minDate", selectedDate);
             getTagReport($("#from").val(), $("#to").val());
             getLocationReport($("#from").val(), $("#to").val());
+            //getGroupReport($("#from").val(), $("#to").val());
         }
     });
     $("#to").datepicker({
@@ -469,7 +470,7 @@ function monthDiff(d1, d2) {
 }
 
 var getGroupReport = function (from, to) {
-    $.getJSON("http://localhost:3000/api/v0/analytics/monthlygrowth?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+    $.getJSON("http://localhost:3000/api/v0/analytics/weeklygrowth?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
 
         // Get months between the dates
         var monthCount = monthDiff(new Date(from), new Date(to));
@@ -483,7 +484,7 @@ var getGroupReport = function (from, to) {
         var seriesName = [];
 
         $.each(data, function (key, val) {
-            categoryArr.push(val.month);
+            categoryArr.push(val.week);
             seriesName.push(val.group);
         });
 
@@ -498,7 +499,7 @@ var getGroupReport = function (from, to) {
             $.each(data, function (key, val) {
                 if (val.group == item) {
                     dataPointsArr = [];
-                    var thisDateTime = new Date(val.month);
+                    var thisDateTime = new Date(val.week);
                     var utcDateTime = Date.UTC(thisDateTime.getUTCFullYear(), thisDateTime.getUTCMonth(), thisDateTime.getUTCDate());
                     dataPointsArr.push(utcDateTime);
                     dataPointsArr.push(val.members);
@@ -816,20 +817,25 @@ var buildGroupChart = function (categories, series) {
             text: $(".group-tags").val() + ' Meetup Members in ' + document.getElementById("location").value,
         },
         legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'top',
-            x: 0,
-            y: 50
+            enabled: false
         },
         subtitle: {
             text: 'Source: Meetup.com'
         },
         plotOptions: {
-            series: {
-                lineWidth: 2
-            }
-        },
+                line: {
+                    marker: {
+                        enabled: false,
+                        symbol: 'circle',
+                        radius: 2,
+                        states: {
+                            hover: {
+                                enabled: true
+                            }
+                        }
+                    }
+                }
+            },
         xAxis: {
             type: 'datetime',
             dateTimeLabelFormats: { // don't display the dummy year

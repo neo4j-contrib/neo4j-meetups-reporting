@@ -112,25 +112,24 @@ var _groupCountByTag = function(results, callback) {
 
 var _getWeeklyGrowthPercent = function (params, options, callback) {
   var cypher_params = {
-    startDate: params.startDate,
-    endDate: params.endDate,
+    startDate: getTicks(params.startDate),
+    endDate: getTicks(params.endDate),
     city: params.city,
+    country: params.country,
     topics: params.topics,
     groups: params.groups
   };
   var query = [
-    'MATCH (dayStart:Day { day: { startDate }.day, month: { startDate }.month, year: { startDate }.year }),',
-    '(dayEnd:Day { day: { endDate }.day, month: { endDate }.month, year: { endDate }.year })', 
-    'MATCH (dayStart)-[:NEXT*0..]->(day:Day)-[:NEXT*0..]->(dayEnd),',
-    '      (day)<-[:HAS_DAY]-(week:Week)',
-    'WITH DISTINCT week',
-    'MATCH (week)-[:HAS_DAY]->(day)<-[:ON_DAY]-(stats:Stats)<-[:HAS_MEMBERS]-(group:Group)-[:LOCATED_IN]->(location:Location),',
-    '      (group)-[:HAS_TAG]->(tag:Tag)',
-    'WHERE tag.tag in { topics }' + (params.city ? ' AND location.city = { city }' : '') + (params.groups.length > 0 ? ' AND group.name in { groups }' : ''),
-    'WITH day, week, group, stats',
-    'ORDER BY day.timestamp',
-    'WITH week, head(collect(day)) as day, group, last(collect(stats)) as members',
-    'WITH DISTINCT (day.month + "/" + day.day) as week, group.name as group, members.count as members, day',
+    'MATCH (d:Day)<-[:HAS_DAY]-(month:Month)',
+    'WHERE d.timestamp > { startDate } AND d.timestamp < { endDate }',
+    'WITH DISTINCT month',
+    'MATCH (month:Month)-[:HAS_DAY]->(day:Day { dayofweek: 1 })',
+    'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
+    'WHERE tag.tag in { topics }',
+    'WITH tag, location, day',
+    'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day',
+    'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as week, group.name as group, stats.count as members, day',
     'ORDER BY day.timestamp',
     'RETURN week, group, members'
   ].join('\n');
