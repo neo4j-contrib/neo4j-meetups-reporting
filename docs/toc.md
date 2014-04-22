@@ -97,6 +97,7 @@ The REST API module of this project is based on a fork of Swagger. See below for
 This section documents the directory structure of the REST API module of this project, example usage, and specifications for each API call.
 
 * [api/app.js](#apiappjs)
+* [api/neo4j/cypher.js](#apineo4jcypherjs)
 * [api/models](#apimodels)
   *  [api/models/analytics.js](#apimodelsanalyticsjs)
     * [getWeeklyGrowthPercent](#getweeklygrowthpercent)
@@ -106,7 +107,6 @@ This section documents the directory structure of the REST API module of this pr
     * [getCities](#getcities)
     * [getCountries](#getcountries)
     * [getGroupCountByTag](#getgroupcountbytag)
-* [api/views](#apiviews)
 * [api/routes](#apiroutes)
   *  [api/routes/analytics.js](#apiroutesanalyticsjs)
     * [/analytics/weeklygrowth](#analyticsweeklygrowth)
@@ -120,6 +120,18 @@ This section documents the directory structure of the REST API module of this pr
 #### api/app.js
 
 The `api/app.js` file is the entry-point to starting the REST API.
+
+#### api/neo4j/cypher.js
+
+The `api/neo4j/cypher.js` file is the Neo4j graph database driver for Node.js. This file is the helper module that makes RESTful requests to the Neo4j REST API.
+
+```javascript
+var neo4j = require('neo4j'),
+    db = new neo4j.GraphDatabase('http://localhost:7474/'),
+    _ = require('underscore');
+```
+
+Replace `http://localhost:7474/` with your desired Neo4j database endpoint when deploying to production.
 
 #### api/models
 
@@ -780,8 +792,6 @@ Below is a list of parameters for this API call, a description, and example usag
 
 ---
 
-#### api/views
-
 #### api/routes
 
 The `routes` directory contains files that define a group of endpoints with a set of specifications for each REST API call. These specifications contain a `description`, `path`, `notes`, `summary`, `method`, `params`, `responseClass`, `errorResponses`, and `nickname`.
@@ -1072,6 +1082,12 @@ This file contains the main style rules that override and extend the bootstrap s
 
 This file contains the main JavaScript code that initializes the client-side logic and events on the [dashboard/dist/index.html](#dashboarddistindexhtml) HTML file.
 
+```javascript
+var apiUrl = "http://localhost:3000/";
+```
+
+Replace `http://localhost:3000/` with the URL to your hosted analytics [REST API](#rest-api) when deploying to production.
+
 # Neo4j
 
 This section covers storage options and deployment with Neo4j.
@@ -1117,7 +1133,7 @@ This section covers scheduled data import services from an external REST API.
 
 * [Setup](#setup-2)
 * [Dependencies](#dependencies-2)
-* [Project Files](#project-files)
+* [Project Files](#project-files-2)
 
 ## Setup
 

@@ -1,3 +1,5 @@
+var apiUrl = "http://localhost:3000/";
+
 var locationTypeahead;
 var countries;
 var cities;
@@ -26,7 +28,7 @@ $(function () {
         prefetch: {
             // url points to a json file that contains an array of country names, see
             // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
-            url: 'http://localhost:3000/api/v0/analytics/countries?api_key=special-key&neo4j=true&cache=yes',
+            url: apiUrl + 'api/v0/analytics/countries?api_key=special-key&neo4j=true&cache=yes',
             // the json file contains an array of strings, but the Bloodhound
             // suggestion engine expects JavaScript objects so this converts all of
             // those strings
@@ -50,7 +52,7 @@ $(function () {
         prefetch: {
             // url points to a json file that contains an array of country names, see
             // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
-            url: 'http://localhost:3000/api/v0/analytics/cities?api_key=special-key&neo4j=true&cache=yes',
+            url: apiUrl + 'api/v0/analytics/cities?api_key=special-key&neo4j=true&cache=yes',
             // the json file contains an array of strings, but the Bloodhound
             // suggestion engine expects JavaScript objects so this converts all of
             // those strings
@@ -470,7 +472,7 @@ function monthDiff(d1, d2) {
 }
 
 var getGroupReport = function (from, to) {
-    $.getJSON("http://localhost:3000/api/v0/analytics/weeklygrowth?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+    $.getJSON(apiUrl + "api/v0/analytics/weeklygrowth?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
 
         // Get months between the dates
         var monthCount = monthDiff(new Date(from), new Date(to));
@@ -534,7 +536,7 @@ var getGroupReport = function (from, to) {
 
 var getTagReport = function (from, to) {
     $('.loader').show();
-    $.getJSON("http://localhost:3000/api/v0/analytics/monthlygrowthbytag?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+    $.getJSON(apiUrl + "api/v0/analytics/monthlygrowthbytag?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
         $('.loader').hide();
 
         // Get months between the dates
@@ -628,7 +630,7 @@ var getTagReport = function (from, to) {
         buildArcChart(arcSeries, 'arc-container', 'Relative Growth %', 'Cumulative Growth', '{series.name}: <b>{point.percentage:.1f}%</b>');
     });
 
-  $.getJSON("http://localhost:3000/api/v0/analytics/groupsbytag?" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&tags=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+  $.getJSON(apiUrl + "api/v0/analytics/groupsbytag?" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&tags=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
         var arcSeries = [];
         $(data).each(function(key, val){
             var item = [];
@@ -641,7 +643,7 @@ var getTagReport = function (from, to) {
 };
 
 var getLocationReport = function (from, to) {
-    $.getJSON("http://localhost:3000/api/v0/analytics/monthlygrowthbylocation?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+    $.getJSON(apiUrl + "api/v0/analytics/monthlygrowthbylocation?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
         var table = $(".table-responsive");
 
         $(table).empty();
@@ -739,7 +741,7 @@ var getLocationReport = function (from, to) {
         
     });
 
-  $.getJSON("http://localhost:3000/api/v0/analytics/groupsbytag?" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&tags=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+  $.getJSON(apiUrl + "api/v0/analytics/groupsbytag?" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&tags=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
         var arcSeries = [];
         $(data).each(function(key, val){
             var item = [];
