@@ -64,15 +64,23 @@ RETURN week, group, members
 ######## Parameters
 
 * `startDate`
+... A date to retrieve results from. Results will be returned for the entire week that the start date occurs within.
 * `endDate`
+... A date to retrieve results until. Results will be returned for the entire week that the start date occurs within.
 * `city`
+... The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.
 * `country`
+... The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.
 * `topics`
+... A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.
 * `groups`
+... A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.
 
 ####### getMonthlyGrowthPercent
 
 Get monthly growth percent of meetup groups as a time series.
+
+######## Cypher query
 
 ```cypher
 MATCH (d:Day)<-[:HAS_DAY]-(month:Month)
@@ -89,9 +97,20 @@ ORDER BY day.timestamp
 RETURN month, group, members
 ```
 
+######## Parameters
+
+* `startDate`
+* `endDate`
+* `city`
+* `country`
+* `topics`
+* `groups`
+
 ####### getMonthlyGrowthPercentByTag
 
 Get monthly growth percent of meetup group tags as a time series.
+
+######## Cypher query
 
 ```cypher
 MATCH (d:Day)<-[:HAS_DAY]-(month:Month)
@@ -108,9 +127,20 @@ ORDER BY day.timestamp
 RETURN month, tag, members
 ```
 
+######## Parameters
+
+* `startDate`
+* `endDate`
+* `city`
+* `country`
+* `topics`
+* `groups`
+
 ####### getMonthlyGrowthPercentByLocation
 
 Get monthly growth percent of meetup group locations and tags as a time series.
+
+######## Cypher query
 
 ```cypher
 MATCH (d:Day)<-[:HAS_DAY]-(month:Month)
@@ -127,27 +157,50 @@ ORDER BY day.timestamp
 RETURN month, tag, members, city
 ```
 
+######## Parameters
+
+* `startDate`
+* `endDate`
+* `city`
+* `country`
+* `topics`
+* `groups`
+
 ####### getCities
 
 Get a list of cities that meetup groups reside in.
+
+######## Cypher query
 
 ```cypher
 MATCH (location:Location)
 RETURN DISTINCT location.city as city
 ```
 
+######## Parameters
+
+This query does not use parameters.
+
 ####### getCountries
 
 Get a list of countries that meetup groups reside in.
+
+######## Cypher query
 
 ```cypher
 MATCH (location:Location)
 RETURN DISTINCT location.country as country
 ```
 
+######## Parameters
+
+This query does not use parameters.
+
 ####### getGroupCountByTag
 
 Get a count of groups by tag.
+
+######## Cypher query
 
 ```cypher
 MATCH (tag:Tag), (location:Location{ city: { city }, country: { country } })
@@ -155,6 +208,10 @@ WHERE tag.tag in { tags }
 MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location)
 RETURN tag.tag as tag, count(group) as count
 ```
+
+######## Parameters
+
+* `topics`
 
 ##### Views
 
