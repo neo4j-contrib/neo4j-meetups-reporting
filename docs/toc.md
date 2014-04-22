@@ -32,13 +32,13 @@ The `models/analytics.js` file contains a set of functions that are meant to man
 
 The Neo4j Cypher queries mapped to the `models/analytics.js` file are defined below.
 
-*[getWeeklyGrowthPercent](#-getweeklygrowthpercent)
-*[getMonthlyGrowthPercent](#-getmonthlygrowthpercent)
-*[getMonthlyGrowthPercentByTag](#-getmonthlygrowthpercentbytag)
-*[getMonthlyGrowthPercentByLocation](#-getmonthlygrowthpercentbytag)
-*[getCities](#-getcities)
-*[getCountries](#-getcountries)
-*[getGroupCountByTag](#-getgroupcountbytag)
+* [getWeeklyGrowthPercent](#-getweeklygrowthpercent)
+* [getMonthlyGrowthPercent](#-getmonthlygrowthpercent)
+* [getMonthlyGrowthPercentByTag](#-getmonthlygrowthpercentbytag)
+* [getMonthlyGrowthPercentByLocation](#-getmonthlygrowthpercentbytag)
+* [getCities](#-getcities)
+* [getCountries](#-getcountries)
+* [getGroupCountByTag](#-getgroupcountbytag)
 
 ####### getWeeklyGrowthPercent
 
@@ -63,12 +63,12 @@ RETURN week, group, members
 
 ######## Parameters
 
-*`startDate`
-*`endDate`
-*`city`
-*`country`
-*`topics`
-*`groups`
+* `startDate`
+* `endDate`
+* `city`
+* `country`
+* `topics`
+* `groups`
 
 ####### getMonthlyGrowthPercent
 
@@ -170,13 +170,13 @@ The `analytics.js` file contains a set of REST API call definitions and specific
 
 The analytics API calls are as follows:
 
-*[/analytics/weeklygrowth](#-analyticsweeklygrowth)
-*[/analytics/monthlygrowth](#-analyticsmonthlygrowth)
-*[/analytics/monthlygrowthbytag](#-analyticsmonthlygrowthbytag)
-*[/analytics/monthlygrowthbylocation](#-analyticsmonthlygrowthbylocation)
-*[/analytics/groupsbytag](#-analyticsgroupsbytag)
-*[/analytics/cities](#-analyticscities)
-*[/analytics/countries](#-analyticscountries)
+* [/analytics/weeklygrowth](#-analyticsweeklygrowth)
+* [/analytics/monthlygrowth](#-analyticsmonthlygrowth)
+* [/analytics/monthlygrowthbytag](#-analyticsmonthlygrowthbytag)
+* [/analytics/monthlygrowthbylocation](#-analyticsmonthlygrowthbylocation)
+* [/analytics/groupsbytag](#-analyticsgroupsbytag)
+* [/analytics/cities](#-analyticscities)
+* [/analytics/countries](#-analyticscountries)
 
 ####### /analytics/weeklygrowth
 
