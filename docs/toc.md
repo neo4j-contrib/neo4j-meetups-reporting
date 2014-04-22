@@ -30,9 +30,21 @@ The `models` folder contains files that manage Cypher queries that map to REST A
 
 The `models/analytics.js` file contains a set of functions that are meant to manage parameterized transactions to the Neo4j graph database.
 
+The Neo4j Cypher queries mapped to the `models/analytics.js` file are defined below.
+
+...[getWeeklyGrowthPercent](#-getweeklygrowthpercent)
+...[getMonthlyGrowthPercent](#-getmonthlygrowthpercent)
+...[getMonthlyGrowthPercentByTag](#-getmonthlygrowthpercentbytag)
+...[getMonthlyGrowthPercentByLocation](#-getmonthlygrowthpercentbytag)
+...[getCities](#-getcities)
+...[getCountries](#-getcountries)
+...[getGroupCountByTag](#-getgroupcountbytag)
+
 ####### getWeeklyGrowthPercent
 
 Get weekly growth percent of meetup groups as a time series.
+
+######## Cypher query
 
 ```cypher
 MATCH (d:Day)<-[:HAS_DAY]-(month:Month)
@@ -49,29 +61,100 @@ ORDER BY day.timestamp
 RETURN week, group, members
 ```
 
+######## Parameters
+
+...`startDate`
+...`endDate`
+...`city`
+...`country`
+...`topics`
+...`groups`
+
 ####### getMonthlyGrowthPercent
 
 Get monthly growth percent of meetup groups as a time series.
+
+```cypher
+MATCH (d:Day)<-[:HAS_DAY]-(month:Month)
+WHERE d.timestamp > { startDate } AND d.timestamp < { endDate }
+WITH DISTINCT month
+MATCH (month:Month)-[:HAS_DAY]->(day:Day { day: 1 })
+MATCH (tag:Tag), (location:Location{ city: { city }, country: { country } })
+WHERE tag.tag in { topics }
+WITH tag, location, day
+MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day
+MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)
+WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as month, group.name as group, stats.count as members, day
+ORDER BY day.timestamp
+RETURN month, group, members
+```
 
 ####### getMonthlyGrowthPercentByTag
 
 Get monthly growth percent of meetup group tags as a time series.
 
+```cypher
+MATCH (d:Day)<-[:HAS_DAY]-(month:Month)
+WHERE d.timestamp > { startDate } AND d.timestamp < { endDate }
+WITH DISTINCT month
+MATCH (month:Month)-[:HAS_DAY]->(day:Day { day: 1 })
+MATCH (tag:Tag), (location:Location{ city: { city }, country: { country } })
+WHERE tag.tag in { topics }
+WITH tag, location, day
+MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag
+MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)
+WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as month, tag.tag as tag, sum(stats.count) as members, day
+ORDER BY day.timestamp
+RETURN month, tag, members
+```
+
 ####### getMonthlyGrowthPercentByLocation
 
 Get monthly growth percent of meetup group locations and tags as a time series.
+
+```cypher
+MATCH (d:Day)<-[:HAS_DAY]-(month:Month)
+WHERE d.timestamp > { startDate } AND d.timestamp < { endDate }
+WITH DISTINCT month
+MATCH (month:Month)-[:HAS_DAY]->(day:Day { day: 1 })
+MATCH (tag:Tag), (location:Location{ city: { city }, country: { country } })
+WHERE tag.tag in { topics }
+WITH tag, location, day
+MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag, location
+MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)
+WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as month, location.city as city, tag.tag as tag, sum(stats.count) as members, day
+ORDER BY day.timestamp
+RETURN month, tag, members, city
+```
 
 ####### getCities
 
 Get a list of cities that meetup groups reside in.
 
+```cypher
+MATCH (location:Location)
+RETURN DISTINCT location.city as city
+```
+
 ####### getCountries
 
 Get a list of countries that meetup groups reside in.
 
+```cypher
+MATCH (location:Location)
+RETURN DISTINCT location.country as country
+```
+
 ####### getGroupCountByTag
 
 Get a count of groups by tag.
+
+```cypher
+MATCH (tag:Tag), (location:Location{ city: { city }, country: { country } })
+WHERE tag.tag in { tags }
+MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location)
+RETURN tag.tag as tag, count(group) as count
+```
 
 ##### Views
 
@@ -87,13 +170,13 @@ The `analytics.js` file contains a set of REST API call definitions and specific
 
 The analytics API calls are as follows:
 
-* [/analytics/weeklygrowth](#-analyticsweeklygrowth)
-* [/analytics/monthlygrowth](#-analyticsmonthlygrowth)
-* [/analytics/monthlygrowthbytag](#-analyticsmonthlygrowthbytag)
-* [/analytics/monthlygrowthbylocation](#-analyticsmonthlygrowthbylocation)
-* [/analytics/groupsbytag](#-analyticsgroupsbytag)
-* [/analytics/cities](#-analyticscities)
-* [/analytics/countries](#-analyticscountries)
+...[/analytics/weeklygrowth](#-analyticsweeklygrowth)
+...[/analytics/monthlygrowth](#-analyticsmonthlygrowth)
+...[/analytics/monthlygrowthbytag](#-analyticsmonthlygrowthbytag)
+...[/analytics/monthlygrowthbylocation](#-analyticsmonthlygrowthbylocation)
+...[/analytics/groupsbytag](#-analyticsgroupsbytag)
+...[/analytics/cities](#-analyticscities)
+...[/analytics/countries](#-analyticscountries)
 
 ####### /analytics/weeklygrowth
 
