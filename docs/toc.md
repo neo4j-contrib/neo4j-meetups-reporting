@@ -984,7 +984,24 @@ Returns a distinct list of countries for typeahead.
 
 # Dashboard
 
-This section covers the graph-based analytics web dashboard.
+This section covers the graph-based analytics web dashboard. The dashboard is a web application that uses client-side JavaScript to communicate with the Neo4j Swagger [REST API](#rest-api) to populate a series of interactive chart controls with data. This web application uses bootstrap for the front-end styles and highcharts.js for the charting controls.
+
+* [Demo](#demo2)
+* [Setup](#setup2)
+* [Dependencies](#dependencies2)
+* [Project Files](#project-files2)
+
+### Demo
+
+A live online demo for the analytics dashboard is located here: [http://meetup-analytics-dashboard.herokuapp.com/](http://meetup-analytics-dashboard.herokuapp.com/)
+
+![Analytics Dashboard Demo](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/dashboard-demo.png "Analytics Dashboard Demo")
+
+### Setup
+
+### Dependencies
+
+### Project Files
 
 # Neo4j
 
