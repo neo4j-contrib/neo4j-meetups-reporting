@@ -86,6 +86,18 @@ RETURN week, group, members
   *  Multiple topic names should be delimited by a comma. 
   *  Leave blank to ignore this field.
 
+######## Example result
+
+```javascript
+[
+  {
+    "week": "1/6/2014",
+    "group": "NYC Neo4j",
+    "members": 108
+  }
+]
+```
+
 ####### getMonthlyGrowthPercent
 
 Get monthly growth percent of meetup groups as a time series.
@@ -110,11 +122,39 @@ RETURN month, group, members
 ######## Parameters
 
 * `startDate`
+  *  A date to retrieve results from.
+  *  Results will be returned for the entire week that the start date occurs within.
 * `endDate`
+  *  A date to retrieve results until.
+  *  Results will be returned for the entire week that the start date occurs within.
 * `city`
+  *  The city name where a meetup group resides.
+  *  This field is case sensitive.
+  *  Leave blank to query on world-wide meetup groups.
 * `country`
+  *  The country code where a meetup group resides.
+  *  This field is case sensitive.
+  *  Leave blank to query on world-wide meetup groups.
 * `topics`
+  *  A list of topics that a meetup group must have to be returned in the result set.
+  *  Multiple topic names should be delimited by a comma.
 * `groups`
+  *  A list of names to match on meetup groups.
+  *  Only groups with the name that are specified in the list are returned.
+  *  Multiple topic names should be delimited by a comma. 
+  *  Leave blank to ignore this field.
+
+######## Example result
+
+```javascript
+[
+  {
+    "month": "1/1/2014",
+    "group": "Bay Area Graph Geeks",
+    "members": 116
+  }
+]
+```
 
 ####### getMonthlyGrowthPercentByTag
 
@@ -140,11 +180,39 @@ RETURN month, tag, members
 ######## Parameters
 
 * `startDate`
+  *  A date to retrieve results from.
+  *  Results will be returned for the entire week that the start date occurs within.
 * `endDate`
+  *  A date to retrieve results until.
+  *  Results will be returned for the entire week that the start date occurs within.
 * `city`
+  *  The city name where a meetup group resides.
+  *  This field is case sensitive.
+  *  Leave blank to query on world-wide meetup groups.
 * `country`
+  *  The country code where a meetup group resides.
+  *  This field is case sensitive.
+  *  Leave blank to query on world-wide meetup groups.
 * `topics`
+  *  A list of topics that a meetup group must have to be returned in the result set.
+  *  Multiple topic names should be delimited by a comma.
 * `groups`
+  *  A list of names to match on meetup groups.
+  *  Only groups with the name that are specified in the list are returned.
+  *  Multiple topic names should be delimited by a comma. 
+  *  Leave blank to ignore this field.
+
+######## Example result
+
+```javascript
+[
+  {
+    "month": "1/1/2014",
+    "tag": "neo4j",
+    "members": 738
+  }
+]
+```
 
 ####### getMonthlyGrowthPercentByLocation
 
@@ -170,11 +238,40 @@ RETURN month, tag, members, city
 ######## Parameters
 
 * `startDate`
+  *  A date to retrieve results from.
+  *  Results will be returned for the entire week that the start date occurs within.
 * `endDate`
+  *  A date to retrieve results until.
+  *  Results will be returned for the entire week that the start date occurs within.
 * `city`
+  *  The city name where a meetup group resides.
+  *  This field is case sensitive.
+  *  Leave blank to query on world-wide meetup groups.
 * `country`
+  *  The country code where a meetup group resides.
+  *  This field is case sensitive.
+  *  Leave blank to query on world-wide meetup groups.
 * `topics`
+  *  A list of topics that a meetup group must have to be returned in the result set.
+  *  Multiple topic names should be delimited by a comma.
 * `groups`
+  *  A list of names to match on meetup groups.
+  *  Only groups with the name that are specified in the list are returned.
+  *  Multiple topic names should be delimited by a comma. 
+  *  Leave blank to ignore this field.
+
+######## Example result
+
+```javascript
+[
+  {
+    "month": "1/1/2014",
+    "tag": "neo4j",
+    "city": "San Francisco",
+    "members": 738
+  }
+]
+```
 
 ####### getCities
 
@@ -191,6 +288,25 @@ RETURN DISTINCT location.city as city
 
 This query does not use parameters.
 
+######## Example result
+
+```javascript
+[
+  {
+    "city": "New York"
+  },
+  {
+    "city": "Brooklyn"
+  },
+  {
+    "city": "Boston"
+  },
+  {
+    "city": "Cambridge"
+  }
+]
+```
+
 ####### getCountries
 
 Get a list of countries that meetup groups reside in.
@@ -205,6 +321,37 @@ RETURN DISTINCT location.country as country
 ######## Parameters
 
 This query does not use parameters.
+
+######## Example result
+
+```javascript
+[
+  {
+    "country": "US"
+  },
+  {
+    "country": "GB"
+  },
+  {
+    "country": "FR"
+  },
+  {
+    "country": "DE"
+  },
+  {
+    "country": "SE"
+  },
+  {
+    "country": "DK"
+  },
+  {
+    "country": "BE"
+  },
+  {
+    "country": "NO"
+  }
+]
+```
 
 ####### getGroupCountByTag
 
@@ -222,6 +369,19 @@ RETURN tag.tag as tag, count(group) as count
 ######## Parameters
 
 * `topics`
+  *  A list of topics that a meetup group must have to be returned in the result set.
+  *  Multiple topic names should be delimited by a comma.
+
+######## Example result
+
+```javascript
+[
+  {
+    "tag": "neo4j",
+    "count": 2
+  }
+]
+```
 
 ##### Views
 
