@@ -68,6 +68,8 @@ The `routes` directory contains files that define a group of endpoints with a se
 
 The `analytics.js` file contains a set of REST API call definitions and specifications that query the Neo4j graph database with a set of parameters that return analytical results as JSON objects. See below for a set of available endpoints and notes about their return results.
 
+![Neo4j Swagger REST API calls for Analytics routes.](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/Swagger_UI_analytics.png "Analytics REST API calls.")
+
 ####### /analytics/weeklygrowth
 
 Returns a set of data points containing the week of the year, the meetup group name, and membership count.
