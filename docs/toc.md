@@ -986,10 +986,10 @@ Returns a distinct list of countries for typeahead.
 
 This section covers the graph-based analytics web dashboard. The dashboard is a web application that uses client-side JavaScript to communicate with the Neo4j Swagger [REST API](#rest-api) to populate a series of interactive chart controls with data. This web application uses bootstrap for the front-end styles and highcharts.js for the charting controls.
 
-* [Demo](#demo2)
-* [Setup](#setup2)
-* [Dependencies](#dependencies2)
-* [Project Files](#project-files2)
+* [Demo](#demo-1)
+* [Setup](#setup-1)
+* [Dependencies](#dependencies-1)
+* [Project Files](#project-files-1)
 
 ### Demo
 
@@ -999,9 +999,78 @@ A live online demo for the analytics dashboard is located here: [http://meetup-a
 
 ### Setup
 
+From the terminal, go to the `dashboard` directory of the project and run `npm install`, after `node_modules` are installed, run `node app`. The analytics dashboard will be started at `http://localhost:5000`
+
 ### Dependencies
 
+Below are the Node.js module dependencies for the analytics web dashboard component.
+
+```javascript
+"dependencies": {
+  "express": ">= 4.0.x"
+}
+```
+
 ### Project Files
+
+This section documents the directory structure of the web dashboard module of this project, example usage, and outline of client-based JavaScript used to assemble report data and bind to the [REST API](#rest-api). 
+
+* [dashboard/app.js](#dashboardappjs)
+* [dashboard/dist/index.html](#dashboarddistindexhtml)
+* [dashboard/dist/css/dashboard.css](#dashboarddistcssdashboardcss)
+* [dashboard/dist/js/main.js](#dashboarddistjsmainjs)
+
+#### dashboard/app.js
+
+The `dashboard/app.js` file is the entry-point to starting the web dashboard.
+
+#### dashboard/dist/index.html
+
+The `dashboard/dist/index.html` is the index HTML file for the web dashboard. This file containts the HTML boostrap markup for charting components and reporting components that are driven by data bindings to the [REST API](#rest-api) endpoints. The JavaScript that wires up and initializes the components of this page can be found in the [main.js](dashboard/dist/js/main.js) file.
+
+#### Charts
+
+Below is a list of charting controls and their associated report for the web dashboard.
+
+* Line chart
+  * [Meetup Tag Growth %](#meetup-tag-growth-)
+* Bar chart
+  * [Cumulative Meetup Growth](#cumulative-meetup-growth)
+* Arc chart
+  * [Category Growth %](#category-growth-)
+  * [Groups By Tag](#groups-by-tag)
+
+##### Meetup Tag Growth %
+
+![Meetup Tag Growth %](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/dashboard-line-chart-tag-growth.png "Meetup Tag Growth %")
+
+Thie chart plots a line chart of the time series for a meetup group topic on Meetup.com. Each group on Meetup.com has a set of topics associated with it. This chart is meant to show the percent growth month over month. 
+
+##### Cumulative Meetup Growth
+
+![Cumulative Meetup Tag Growth](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/dashboard-bar-chart-cumulative-tag-growth.png "Cumulative Meetup Tag Growth")
+
+This chart plots a bar chart of the cumulative growth of a meetup group topic on Meetup.com. Using the time series data of monthly growth from the [Meetup Tag Growth %](#meetup-tag-growth-) chart, the growth percents over the period are aggregated into a sum for each topic. This chart shows total growth percentage over the period.
+
+##### Category Growth %
+
+![Relative Tag Growth %](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/dashboard-arc-chart-relative-tag-growth.png "Relative Tag Growth %")
+
+This chart plots an arc chart of the relative cumulative growth of a meetup group topic on Meetup.com. Using the data from [Cumulative Meetup Growth](#cumulative-meetup-growth), the percentage growth of each topic over the period is compared relative to one another as a ratio of 100.
+
+##### Groups By Tag
+
+![Groups By Tag](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/dashboard-arc-chart-groups-by-tag.png "Groups By Tag")
+
+This chart plots an arc chart of the number of groups in the region during the period for each topic. Each group is compared relative to one another as a ratio of 100.
+
+#### dashboard/dist/css/dashboard.css
+
+This file contains the main style rules that override and extend the bootstrap style rules for elements of the [dashboard/dist/index.html](#dashboarddistindexhtml) HTML file.
+
+#### dashboard/dist/js/main.js
+
+This file contains the main JavaScript code that initializes the client-side logic and events on the [dashboard/dist/index.html](#dashboarddistindexhtml) HTML file.
 
 # Neo4j
 
