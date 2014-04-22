@@ -1,11 +1,11 @@
 {
-  "name": "neo4j-app-movies-ui",
+  "name": "meetup-analytics-scheduler",
   "version": "0.0.1",
   "author": "Kenny Bastani <kenny.bastani@neotechnology.com> (https://github.com/kbastani)",
-  "description": "A movie browser demo powered by Neo4j",
+  "description": "REST API data import services for graph-based analytics.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kbastani/neo4j-app-movies-ui.git"
+    "url": "https://github.com/kbastani/meetup-analytics.git"
   },
   "keywords": [
     "node",
@@ -14,24 +14,30 @@
     "api",
     "http",
     "rest",
-    "swagger",
-    "server",
-    "movies"
+    "import",
+    "scheduler"
   ],
   "engines": {
     "node": "0.10.x"
   },
   "dependencies": {
-    "express": ">= 4.0.x"
+    "async": "^0.7.0",
+    "cron": "^1.0.4",
+    "express": "^4.0.0",
+    "hat": "0.0.3",
+    "meetup-api": "^0.1.3",
+    "neo4j": "^1.1.0",
+    "random-name": "^0.1.0",
+    "underscore": "^1.6.0"
   },
   "license": "MIT",
-  "readmeFilename": "README.md",
-  "gitHead": "5e3a37dcf45478f40b67bb97576b687b9432cd7e",
   "bugs": {
-    "url": "https://github.com/kbastani/neo4j-app-movies-ui/issues"
+    "url": "https://github.com/kbastani/meetup-analytics/issues"
   },
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  }
+  },
+  "homepage": "https://github.com/kbastani/meetup-analytics",
+  "devDependencies": {}
 }

@@ -1140,3 +1140,166 @@ This section covers scheduled data import services from an external REST API.
 ## Dependencies
 
 ## Project Files
+
+```javascript
+var CronJob = require('cron').CronJob;
+var job = new CronJob('0 5 0 * * *', function () {
+      var cities = getPollingCities();
+      iteratorCityCallback(0, cities.length, cities);
+    }, function () {
+
+    },
+    true /* Start the job right now */ ,
+    "America/Los_Angeles" /* Time zone of this job. */
+);
+```
+
+```javascript
+function iteratorCityCallback(count, length, cities) {
+    if (count < length) {
+        // Get the city for this iteration
+        var city = cities[count];
+
+        // Import group stats for day
+        meetup.getGroups({
+            'topic': 'NoSQL',
+            'country': city.country,
+            'city': city.city,
+            'state': city.state,
+            'page': '100'
+        }, function (err, groups) {
+            iteratorGroupCallback(0, groups.results.length, groups.results, count, length, cities);
+        });
+    }
+}
+```
+
+```javascript
+function getPollingCities() {
+    var cities = [{
+        city: "New York",
+        state: "NY",
+        country: "US"
+    }, {
+        city: "Boston",
+        state: "MA",
+        country: "US"
+    }, {
+        city: "Atlanta",
+        state: "GA",
+        country: "US"
+    }, {
+        city: "Seattle",
+        state: "WA",
+        country: "US"
+    }, {
+        city: "Los Angeles",
+        state: "CA",
+        country: "US"
+    }, {
+        city: "San Francisco",
+        state: "CA",
+        country: "US"
+    }, {
+        city: "Chicago",
+        state: "IL",
+        country: "US"
+    }, {
+        city: "Austin",
+        state: "TX",
+        country: "US"
+    }, {
+        city: "Dallas",
+        state: "TX",
+        country: "US"
+    }, {
+        city: "Denver",
+        state: "CO",
+        country: "US"
+    }, {
+        city: "Washington",
+        state: "DC",
+        country: "US"
+    }, {
+        city: "London",
+        state: "",
+        country: "GB"
+    }, {
+        city: "Paris",
+        state: "",
+        country: "FR"
+    }, {
+        city: "München",
+        state: "",
+        country: "DE"
+    }, {
+        city: "Berlin",
+        state: "",
+        country: "DE"
+    }, {
+        city: "Copenhagen",
+        state: "",
+        country: "DK"
+    }, {
+        city: "Stockholm",
+        state: "",
+        country: "SE"
+    }, {
+        city: "Malmö",
+        state: "",
+        country: "SE"
+    }, {
+        city: "Brussels",
+        state: "",
+        country: "BE"
+    }, {
+        city: "Frankfurt",
+        state: "",
+        country: "DE"
+    }, {
+        city: "Hamburg",
+        state: "",
+        country: "DE"
+    }, {
+        city: "Oslo",
+        state: "",
+        country: "NO"
+    }];
+
+    return cities;
+}
+```
+
+```javascript
+var _importGroupStats = function (params, options, callback) {
+
+  var query = [
+      'MERGE (group:Group { name: { csvLine }.group_name })',
+      'ON CREATE SET group.created = toInt({ csvLine }.group_creation_date)',
+      'ON CREATE SET group.year = toInt({ csvLine }.group_creation_date_year)',
+      'ON CREATE SET group.month = toInt({ csvLine }.group_creation_date_month)',
+      'ON CREATE SET group.day = toInt({ csvLine }.group_creation_date_day)',
+      'MERGE (location:Location { city: { csvLine }.group_location, country: { csvLine }.group_country, state: { csvLine }.group_state })',
+      'FOREACH (name in { csvLine }.group_tag |',
+      '      MERGE (tag:Tag { tag: name }))',
+      'MERGE (stats:Stats { group_name: { csvLine }.group_name, month: toInt({ csvLine }.last_month), day: toInt({ csvLine }.last_day), year: toInt({ csvLine }.last_year) })',
+      'ON CREATE SET stats.count = toInt({ csvLine }.group_stats)',
+      'MERGE (day:Day { month: toInt({ csvLine }.month), day: toInt({ csvLine }.day), year: toInt({ csvLine }.year) })',
+      'ON CREATE SET day.timestamp = toInt({ csvLine }.day_timestamp)',
+      'ON CREATE SET day.dayofweek = toInt({ csvLine }.day_of_week)',
+      'MERGE (week:Week { year: toInt({ csvLine }.year), week: toInt({ csvLine }.week_of_year) })',
+      'MERGE (week)-[:HAS_DAY]->(day)',
+      'MERGE (month:Month { year: toInt({ csvLine }.year), month: toInt({ csvLine }.month) })',
+      'MERGE (month)-[:HAS_DAY]->(day)',
+      'MERGE (year:Year { year: toInt({ csvLine }.year) })',
+      'MERGE (year)-[:HAS_MONTH]->(month)',
+      'MERGE (lastDay:Day { month: toInt({ csvLine }.last_month), day: toInt({ csvLine }.last_day), year: toInt({ csvLine }.last_year) })',
+      'MERGE (group)-[:LOCATED_IN]->(location)',
+      'MERGE (group)-[:HAS_MEMBERS]->(stats)',
+      'MERGE (stats)-[:ON_DAY]->(day)',
+      'MERGE (lastDay)-[:NEXT]->(day)',
+      'RETURN group.name as name'].join('\n');
+
+  callback(null, query, params);
+};
+```
