@@ -6,6 +6,10 @@ A graph-based analytics platform to track and measure meetup.com groups growth o
 
 Check out a demo of the dashboard: [Meetup Analytics NoSQL Dashboard](http://meetup-analytics-dashboard.herokuapp.com/)
 
+## Documentation
+
+Read the full project documentation here: [Graph-based Analytics Platform Docs](https://github.com/kbastani/meetup-analytics/blob/master/docs/DOCS.md)
+
 ## Architecutre
 
 * Front-end web-based dashboard in Node.js and bootstrap
