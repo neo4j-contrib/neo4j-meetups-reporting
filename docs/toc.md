@@ -72,21 +72,121 @@ The `analytics.js` file contains a set of REST API call definitions and specific
 
 Returns a set of data points containing the week of the year, the meetup group name, and membership count.
 
+```javascript
+'spec': {
+  "description" : "Get weekly growth percent of meetup groups as a time series.",
+  "path" : "/analytics/weeklygrowth",
+  "notes" : "Returns a set of data points containing the week of the year, the meetup group name, and membership count.",
+  "summary" : "Get the time series that models the growth percent of meetup groups week over week.",
+  "method": "GET",
+  "params" :  [
+    param.query("startDate", "A date to retrieve results from. Results will be returned for the entire week that the start date occurs within.", "string", true, true),
+    param.query("endDate", "A date to retrieve results until. Results will be returned for the entire week that the start date occurs within.", "string", true, true),
+    param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+    param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
+    param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
+  ],
+  "responseClass" : "List[Analytics]",
+  "errorResponses" : [],
+  "nickname" : "getWeeklyGrowthPercent"
+}
+```
+
 ####### /analytics/monthlygrowth
 
 Returns a set of data points containing the month of the year, the meetup group name, and membership count.
+
+```javascript
+'spec': {
+  "description" : "Get monthly growth percent of meetup groups as a time series.",
+  "path" : "/analytics/monthlygrowth",
+  "notes" : "Returns a set of data points containing the month of the year, the meetup group name, and membership count.",
+  "summary" : "Get the time series that models the growth percent of meetup groups month over month.",
+  "method": "GET",
+  "params" :  [
+    param.query("startDate", "A date to retrieve results from. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
+    param.query("endDate", "A date to retrieve results until. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
+    param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+    param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+    param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
+    param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
+  ],
+  "responseClass" : "List[Analytics]",
+  "errorResponses" : [],
+  "nickname" : "getMonthlyGrowthPercent"
+}
+```
 
 ####### /analytics/monthlygrowthbytag
 
 Returns a set of data points containing the month of the year, the meetup group tag name, and membership count.
 
+```javascript
+'spec': {
+  "description" : "Get monthly growth percent of meetup group tags as a time series.",
+  "path" : "/analytics/monthlygrowthbytag",
+  "notes" : "Returns a set of data points containing the month of the year, the meetup group tag name, and membership count.",
+  "summary" : "Get the time series that models the growth percent of meetup group tags month over month.",
+  "method": "GET",
+  "params" :  [
+    param.query("startDate", "A date to retrieve results from. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
+    param.query("endDate", "A date to retrieve results until. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
+    param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+    param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+    param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
+    param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
+  ],
+  "responseClass" : "List[Analytics]",
+  "errorResponses" : [],
+  "nickname" : "getMonthlyGrowthPercentByTag"
+}
+```
+
 ####### /analytics/monthlygrowthbylocation
 
 Returns a set of data points containing the month of the year, the meetup group tag name, the city, and membership count.
 
+```javascript
+'spec': {
+  "description" : "Get monthly growth percent of meetup group locations and tags as a time series.",
+  "path" : "/analytics/monthlygrowthbylocation",
+  "notes" : "Returns a set of data points containing the month of the year, the meetup group tag name, the city, and membership count.",
+  "summary" : "Get the time series that models the growth percent of meetup group tags month over month, by city.",
+  "method": "GET",
+  "params" :  [
+    param.query("startDate", "A date to retrieve results from. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
+    param.query("endDate", "A date to retrieve results until. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
+    param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+    param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+    param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
+    param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
+  ],
+  "responseClass" : "List[Analytics]",
+  "errorResponses" : [],
+  "nickname" : "getMonthlyGrowthPercentByTag"
+}
+```
+
 ####### /analytics/groupsbytag
 
 Returns a list of tags and the number of groups per tag.
+
+```javascript
+'spec': {
+  "description" : "Get a count of groups by tag.",
+  "path" : "/analytics/groupsbytag",
+  "notes" : "Returns a list of tags and the number of groups per tag.",
+  "summary" : "Gets list of tags and the number of groups per tag.",
+  "method": "GET",
+  "params" :  [param.query("tags", "A list of tags that a meetup group must have to be returned in the result set. Multiple tag names should be delimited by a comma.", "string", true, true),
+  param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+    param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true)],
+  "responseClass" : "List[Tag]",
+  "errorResponses" : [],
+  "nickname" : "getGroupCountByTag"
+}
+```
+
 
 ####### /analytics/cities
 
@@ -95,8 +195,6 @@ Returns a distinct list of cities for typeahead.
 ####### /analytics/countries
 
 Returns a distinct list of countries for typeahead.
-
-##### Endpoints
 
 ## Dashboard
 
