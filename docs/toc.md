@@ -70,6 +70,16 @@ The `analytics.js` file contains a set of REST API call definitions and specific
 
 ![Neo4j Swagger REST API calls for Analytics routes.](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/Swagger_UI_analytics.png "Analytics REST API calls.")
 
+The analytics API calls are as follows:
+
+* [GetWeeklyGrowthPercent](#-analyticsweeklygrowth)
+* [GetMonthlyGrowthPercent](#-analyticsmonthlygrowth)
+* [GetMonthlyGrowthPercentByTag](#-analytics-monthlygrowthbytag)
+* [GetMonthlyGrowthPercentByLocation](#-analytics-monthlygrowthbylocation)
+* [GetGroupCountByTag](#-analytics-groupsbytag)
+* [GetCities](#-analytics-cities)
+* [GetCountries](#-analytics-countries)
+
 ####### /analytics/weeklygrowth
 
 Returns a set of data points containing the week of the year, the meetup group name, and membership count.
