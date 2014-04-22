@@ -936,7 +936,7 @@ Returns a list of tags and the number of groups per tag.
 
 ```javascript
 'spec': {
-	"description": "Get a count of groups by tag.",
+  "description": "Get a count of groups by tag.",
     "path": "/analytics/groupsbytag",
     "notes": "Returns a list of tags and the number of groups per tag.",
     "summary": "Gets list of tags and the number of groups per tag.",
@@ -1127,9 +1127,38 @@ RETURN p
 
 ![Find someone who can help you learn Neo4j](http://neo4j.com/wp-content/themes/neo4jzurb/assets/images/home-shortest.png "Find someone who can help you learn Neo4j.")
 
+### Neo4j Optional Schema
+
+Running the following Cypher query will produce a result that shows how things in the database are related and how.
+
+```cypher
+// What is related, and how
+MATCH (a)-[r]->(b)
+WHERE labels(a) <> [] AND labels(b) <> []
+RETURN DISTINCT head(labels(a)) AS This, type(r) as To, head(labels(b)) AS That
+LIMIT 10
+```
+
+| This        | To           | That  |
+| ------------- |:-------------:| -----:|
+Stats|  ON_DAY| Day|
+Day|  NEXT| Day|
+Week| HAS_DAY|  Day|
+Group|  LOCATED_IN| Location|
+Group|  HAS_MEMBERS|  Stats|
+Group|  HAS_TAG|  Tag|
+Month|  HAS_DAY|  Day|
+Year| HAS_MONTH|  Month|
+
+### Neo4j Graph Data Model
+
+The image below shows an example meta-model for the graph-based analytics Neo4j database.
+
+![Neo4j Graph Data Model](https://raw.github.com/kbastani/meetup-analytics/master/docs/images/meetup-analytics-graph-gist.png "Neo4j Graph Data Model")
+
 # Data Import Scheduler
 
-This section covers scheduled data import services from an external REST API.
+This section covers scheduled data import services from an external REST API. 
 
 * [Setup](#setup-2)
 * [Dependencies](#dependencies-2)
@@ -1137,42 +1166,37 @@ This section covers scheduled data import services from an external REST API.
 
 ## Setup
 
+From the terminal, go to the `scheduler` directory of the project and run `npm install`, after `node_modules` are installed, run `node app`. The Meetup group import scheduler will be started at `http://localhost:3001`. It will run once a day 5 minutes after midnight PST.
+
 ## Dependencies
+
+```javascript
+"dependencies": {
+  "async": "^0.7.0",
+  "cron": "^1.0.4",
+  "express": "^4.0.0",
+  "hat": "0.0.3",
+  "meetup-api": "^0.1.3",
+  "neo4j": "^1.1.0",
+  "random-name": "^0.1.0",
+  "underscore": "^1.6.0"
+}
+```
 
 ## Project Files
 
-```javascript
-var CronJob = require('cron').CronJob;
-var job = new CronJob('0 5 0 * * *', function () {
-      var cities = getPollingCities();
-      iteratorCityCallback(0, cities.length, cities);
-    }, function () {
+This section documents the directory structure of the data import scheduler component of the graph-based analytics platform. The purpose of this component is to make routine calls to the Meetup.com API with a set of criteria.
 
-    },
-    true /* Start the job right now */ ,
-    "America/Los_Angeles" /* Time zone of this job. */
-);
-```
+* [scheduler/app.js](#schedulerappjs)
+* [scheduler/import/importer.js](#schedulerimportimporterjs)
 
-```javascript
-function iteratorCityCallback(count, length, cities) {
-    if (count < length) {
-        // Get the city for this iteration
-        var city = cities[count];
+### scheduler/app.js
 
-        // Import group stats for day
-        meetup.getGroups({
-            'topic': 'NoSQL',
-            'country': city.country,
-            'city': city.city,
-            'state': city.state,
-            'page': '100'
-        }, function (err, groups) {
-            iteratorGroupCallback(0, groups.results.length, groups.results, count, length, cities);
-        });
-    }
-}
-```
+The `scheduler/app.js` file is the entry-point to the data import scheduler component.
+
+#### getPollingCities
+
+The `getPollingCities` function retrieves a list of locations that will be used to import data from. The Meetup.com API is location and tag based for finding groups. The example function below will track meetup groups in `New York`, `Boston`, `Atlanta`, `Seattle`, `Los Angeles`, and `San Francisco`.
 
 ```javascript
 function getPollingCities() {
@@ -1200,75 +1224,92 @@ function getPollingCities() {
         city: "San Francisco",
         state: "CA",
         country: "US"
-    }, {
-        city: "Chicago",
-        state: "IL",
-        country: "US"
-    }, {
-        city: "Austin",
-        state: "TX",
-        country: "US"
-    }, {
-        city: "Dallas",
-        state: "TX",
-        country: "US"
-    }, {
-        city: "Denver",
-        state: "CO",
-        country: "US"
-    }, {
-        city: "Washington",
-        state: "DC",
-        country: "US"
-    }, {
-        city: "London",
-        state: "",
-        country: "GB"
-    }, {
-        city: "Paris",
-        state: "",
-        country: "FR"
-    }, {
-        city: "München",
-        state: "",
-        country: "DE"
-    }, {
-        city: "Berlin",
-        state: "",
-        country: "DE"
-    }, {
-        city: "Copenhagen",
-        state: "",
-        country: "DK"
-    }, {
-        city: "Stockholm",
-        state: "",
-        country: "SE"
-    }, {
-        city: "Malmö",
-        state: "",
-        country: "SE"
-    }, {
-        city: "Brussels",
-        state: "",
-        country: "BE"
-    }, {
-        city: "Frankfurt",
-        state: "",
-        country: "DE"
-    }, {
-        city: "Hamburg",
-        state: "",
-        country: "DE"
-    }, {
-        city: "Oslo",
-        state: "",
-        country: "NO"
     }];
 
     return cities;
 }
 ```
+
+#### iteratorCityCallback
+
+From the list of cities provided from the `getPollingCities` function, the `iteratorCityCallback` function will iterate through each location and request groups from the Meetup.com API with the following criteria.
+
+```javascript
+{
+  'topic': 'NoSQL',
+  'country': city.country,
+  'city': city.city,
+  'state': city.state,
+  'page': '100'
+}
+```
+
+The `topic` property specifies that only Meetup groups with a topic listed on their profile will be imported, in this case groups with the topic `NoSQL`. Since Meetup groups can have multiple topics, many topics will be imported related to `NoSQL`.
+
+The `iteratorCityCallback` function is below. 
+
+```javascript
+function iteratorCityCallback(count, length, cities) {
+    if (count < length) {
+        // Get the city for this iteration
+        var city = cities[count];
+
+        // Import group stats for day
+        meetup.getGroups({
+            'topic': 'NoSQL',
+            'country': city.country,
+            'city': city.city,
+            'state': city.state,
+            'page': '100'
+        }, function (err, groups) {
+            iteratorGroupCallback(0, groups.results.length, groups.results, count, length, cities);
+        });
+    }
+    else
+    {
+      console.log("Import complete");
+      process.exit();
+    }
+}
+```
+
+This is the main loop of the data import process from Meetup.com's API. Since Node.js is event-driven, callbacks are used to indicate the completion of a function. Due to this, an iterator is used to synchronously loop through import processes. This sequential import is required for the import process so that async writes to Neo4j do not cause a deadlock exception to be thrown.
+
+You can read more about Neo4j deadlock exceptions here: [http://docs.neo4j.org/chunked/milestone/transactions-deadlocks.html](http://docs.neo4j.org/chunked/milestone/transactions-deadlocks.html)
+
+#### getGroupImportParameters
+
+The `getGroupImportParameters` constructs a JSON object from a group that is retrieved from the Meetup.com API. This object is constructed to be used as a parameter for Cypher transactions used to write group data to Neo4j. An example object is demonstrated below.
+
+```javascript
+var csvLine = {
+    group_name: group.name,
+    group_creation_date: group.created,
+    group_creation_date_year: createdDate.year,
+    group_creation_date_month: createdDate.month,
+    group_creation_date_day: createdDate.day,
+    group_location: group.city,
+    group_country: group.country,
+    group_state: group.state,
+    group_tag: group.topics.map(function (d) {
+        return d.name;
+    }),
+    last_month: yesterday.getMonth() + 1,
+    last_day: yesterday.getDate(),
+    last_year: yesterday.getFullYear(),
+    group_stats: group.members,
+    month: today.getMonth() + 1,
+    day: today.getDate(),
+    year: today.getFullYear(),
+    day_timestamp: getTicks(today),
+    day_of_week: today.getDay() + 1,
+    week_of_year: getWeekOfYear(today)
+};
+```
+
+### scheduler/import/importer.js
+
+The `scheduler/import/importer.js` file defines Neo4j Cypher queries that take in a set of parameters which are produced from requests to the Meetup.com API for each group returned for a specific location.
 
 ```javascript
 var _importGroupStats = function (params, options, callback) {
@@ -1303,3 +1344,15 @@ var _importGroupStats = function (params, options, callback) {
   callback(null, query, params);
 };
 ```
+
+## Heroku Scheduler
+
+In order to run the data import scheduler on Heroku, you'll need to use the Heroku Scheduler add-on. [Scheduler](https://addons.heroku.com/marketplace/scheduler) is an add-on for running jobs on your app at scheduled time intervals, much like cron in a traditional server environment.
+
+To add the scheduler to your Heroku project, run the following command.
+
+```console
+$ heroku addons:add scheduler --app [app-name]
+```
+
+After Scheduler is added to your Heroku application, manage jobs in the [Scheduler dashboard](https://scheduler.heroku.com/dashboard). Add a job that runs once a day with the command `node app`. Once the data import process is completed each day, the application will automatically terminate its process so it can be called again.

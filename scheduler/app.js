@@ -11,10 +11,10 @@ if ('development' == env) {
     app.use(express.static(__dirname + '/dist'));
 }
 
-var port = process.env.PORT || 3001;
-app.listen(port, function () {
-    console.log("Listening on " + port);
-});
+// var port = process.env.PORT || 3001;
+// app.listen(port, function () {
+//     console.log("Listening on " + port);
+// });
 
 
 function writeResponse(res, response, start) {
@@ -33,19 +33,8 @@ function parseBool(req, key) {
     return 'true' == url.parse(req.url, true).query[key];
 }
 
-//0 5 0 * * * 
-//0 0-59 * * * *
-
-var CronJob = require('cron').CronJob;
-var job = new CronJob('0 5 0 * * *', function () {
-      var cities = getPollingCities();
-      iteratorCityCallback(0, cities.length, cities);
-    }, function () {
-
-    },
-    true /* Start the job right now */ ,
-    "America/Los_Angeles" /* Time zone of this job. */
-);
+var cities = getPollingCities();
+iteratorCityCallback(0, cities.length, cities);
 
 function iteratorCityCallback(count, length, cities) {
     if (count < length) {
@@ -60,9 +49,13 @@ function iteratorCityCallback(count, length, cities) {
             'state': city.state,
             'page': '100'
         }, function (err, groups) {
-            //console.log(city);
             iteratorGroupCallback(0, groups.results.length, groups.results, count, length, cities);
         });
+    }
+    else
+    {
+      console.log("Import complete");
+      process.exit();
     }
 }
 
