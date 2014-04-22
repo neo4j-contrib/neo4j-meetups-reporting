@@ -5,7 +5,7 @@ Welcome to the docs page for this project. This project is meant to be a sample 
 * [Getting Started](#getting-started)
 * [Analytics REST API](#rest-api)
 * [Analytics Web Dashboard](#dashboard)
-* [Analytics Data Import Scheduler](#scheduler)
+* [Analytics Data Import Scheduler](#data-import-scheduler)
 
 # Getting Started
 
@@ -1058,7 +1058,7 @@ This chart plots a bar chart of the cumulative growth of a meetup group topic on
 
 This chart plots an arc chart of the relative cumulative growth of a meetup group topic on Meetup.com. Using the data from [Cumulative Meetup Growth](#cumulative-meetup-growth), the percentage growth of each topic over the period is compared relative to one another as a ratio of 100.
 
-##### Groups By Tag
+##### Group Count By Tag
 
 ![Groups By Tag](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/dashboard-arc-chart-groups-by-tag.png "Groups By Tag")
 
@@ -1111,8 +1111,16 @@ RETURN p
 
 ![Find someone who can help you learn Neo4j](http://neo4j.com/wp-content/themes/neo4jzurb/assets/images/home-shortest.png "Find someone who can help you learn Neo4j.")
 
-# Scheduler
+# Data Import Scheduler
 
-This section covers scheduled data import services from a desired external REST API.
+This section covers scheduled data import services from an external REST API.
 
-## Getting started
+* [Setup](#setup-2)
+* [Dependencies](#dependencies-2)
+* [Project Files](#project-files)
+
+## Setup
+
+## Dependencies
+
+## Project Files
