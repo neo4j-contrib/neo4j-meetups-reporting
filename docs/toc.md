@@ -72,13 +72,13 @@ The `analytics.js` file contains a set of REST API call definitions and specific
 
 The analytics API calls are as follows:
 
-* [GetWeeklyGrowthPercent](#-analyticsweeklygrowth)
-* [GetMonthlyGrowthPercent](#-analyticsmonthlygrowth)
-* [GetMonthlyGrowthPercentByTag](#-analyticsmonthlygrowthbytag)
-* [GetMonthlyGrowthPercentByLocation](#-analyticsmonthlygrowthbylocation)
-* [GetGroupCountByTag](#-analyticsgroupsbytag)
-* [GetCities](#-analyticscities)
-* [GetCountries](#-analyticscountries)
+* [/analytics/weeklygrowth](#-analyticsweeklygrowth)
+* [/analytics/monthlygrowth](#-analyticsmonthlygrowth)
+* [/analytics/monthlygrowthbytag](#-analyticsmonthlygrowthbytag)
+* [/analytics/monthlygrowthbylocation](#-analyticsmonthlygrowthbylocation)
+* [/analytics/groupsbytag](#-analyticsgroupsbytag)
+* [/analytics/cities](#-analyticscities)
+* [/analytics/countries](#-analyticscountries)
 
 ####### /analytics/weeklygrowth
 
