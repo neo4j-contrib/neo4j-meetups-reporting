@@ -86,7 +86,7 @@ The REST API module of this project is based on a fork of Swagger. See below for
 
 #### The Swagger Project
 
-[Swagger](https://helloreverb.com/developers/swagger) is a specification and complete framework implementation for describing, producing, consuming, and visualizing RESTful web services. The overarching goal of Swagger is to enable client and documentation systems to update at the same pace as the server. The documentation of methods, parameters, and models are tightly integrated into the server code, allowing APIs to always stay in sync. With Swagger, deploying managing, and using powerful APIs has never been easier.
+[Swagger](https://helloreverb.com/developers/swagger) is a specification and complete framework implementation for describing, producing, consuming, and visualizing RESTful web services. The overdonuthing goal of Swagger is to enable client and documentation systems to update at the same pace as the server. The documentation of methods, parameters, and models are tightly integrated into the server code, allowing APIs to always stay in sync. With Swagger, deploying managing, and using powerful APIs has never been easier.
 
 #### The Neo4j Swagger Project
 
@@ -1036,7 +1036,7 @@ The `dashboard/app.js` file is the entry-point to starting the web dashboard.
 
 #### dashboard/dist/index.html
 
-The `dashboard/dist/index.html` is the index HTML file for the web dashboard. This file containts the HTML boostrap markup for charting components and reporting components that are driven by data bindings to the [REST API](#rest-api) endpoints. The JavaScript that wires up and initializes the components of this page can be found in the [main.js](dashboard/dist/js/main.js) file.
+The `dashboard/dist/index.html` is the index HTML file for the web dashboard. This file containts the HTML bootstrap markup for charting components and reporting components that are driven by data bindings to the [REST API](#rest-api) endpoints. The JavaScript that wires up and initializes the components of this page can be found in the [main.js](dashboard/dist/js/main.js) file.
 
 #### Charts
 
@@ -1046,7 +1046,7 @@ Below is a list of charting controls and their associated report for the web das
   * [Meetup Tag Growth %](#meetup-tag-growth-)
 * Bar chart
   * [Cumulative Meetup Growth](#cumulative-meetup-growth)
-* Arc chart
+* Donut Chart
   * [Category Growth %](#category-growth-)
   * [Groups By Tag](#groups-by-tag)
 
@@ -1054,7 +1054,7 @@ Below is a list of charting controls and their associated report for the web das
 
 ![Meetup Tag Growth %](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/dashboard-line-chart-tag-growth.png "Meetup Tag Growth %")
 
-Thie chart plots a line chart of the time series for a meetup group topic on Meetup.com. Each group on Meetup.com has a set of topics associated with it. This chart is meant to show the percent growth month over month. 
+This chart plots a line chart of the time series for a meetup group topic on Meetup.com. Each group on Meetup.com has a set of topics associated with it. This chart is meant to show the percent growth month over month. 
 
 ##### Cumulative Meetup Growth
 
@@ -1064,15 +1064,15 @@ This chart plots a bar chart of the cumulative growth of a meetup group topic on
 
 ##### Category Growth %
 
-![Relative Tag Growth %](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/dashboard-arc-chart-relative-tag-growth.png "Relative Tag Growth %")
+![Relative Tag Growth %](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/dashboard-donut-chart-relative-tag-growth.png "Relative Tag Growth %")
 
-This chart plots an arc chart of the relative cumulative growth of a meetup group topic on Meetup.com. Using the data from [Cumulative Meetup Growth](#cumulative-meetup-growth), the percentage growth of each topic over the period is compared relative to one another as a ratio of 100.
+This chart plots an Donut Chart of the relative cumulative growth of a meetup group topic on Meetup.com. Using the data from [Cumulative Meetup Growth](#cumulative-meetup-growth), the percentage growth of each topic over the period is compared relative to one another as a ratio of 100.
 
 ##### Group Count By Tag
 
-![Groups By Tag](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/dashboard-arc-chart-groups-by-tag.png "Groups By Tag")
+![Groups By Tag](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/dashboard-donut-chart-groups-by-tag.png "Groups By Tag")
 
-This chart plots an arc chart of the number of groups in the region during the period for each topic. Each group is compared relative to one another as a ratio of 100.
+This chart plots an Donut Chart of the number of groups in the region during the period for each topic. Each group is compared relative to one another as a ratio of 100.
 
 #### dashboard/dist/css/dashboard.css
 
