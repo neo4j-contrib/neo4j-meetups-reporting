@@ -63,17 +63,17 @@ RETURN week, group, members
 
 ######## Parameters
 
-* `startDate`
+1. `startDate`
 ..* A date to retrieve results from. Results will be returned for the entire week that the start date occurs within.
-* `endDate`
+2. `endDate`
 ..* A date to retrieve results until. Results will be returned for the entire week that the start date occurs within.
-* `city`
+3. `city`
 ..* The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.
-* `country`
+4. `country`
 ..* The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.
-* `topics`
+5. `topics`
 ..* A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.
-* `groups`
+6. `groups`
 ..* A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.
 
 ####### getMonthlyGrowthPercent
