@@ -3,7 +3,7 @@
 Welcome to the docs page for this project. This project is meant to be a sample application for building an end-to-end analytics platform using the *Neo4j* graph database. In addition to Neo4j, this project uses the *Node.js* software platform for each of its modules. The modules in this project include a web-based dashboard with charts, a documented REST API, and scheduled data import services into Neo4j.
 
 * [Getting Started](#getting-started)
-* [Analytics REST API](#restapi)
+* [Analytics REST API](#rest-api)
 * [Analytics Web Dashboard](#dashboard)
 * [Analytics Data Import Scheduler](#scheduler)
 
@@ -832,6 +832,8 @@ Returns a set of data points containing the week of the year, the meetup group n
 
 ##### /analytics/monthlygrowth
 
+![/analytics/monthlygrowth](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/swagger-ui-analytics-get-monthly-growth.png "/analytics/monthlygrowth")
+
 Returns a set of data points containing the month of the year, the meetup group name, and membership count.
 
 ```javascript
@@ -856,6 +858,8 @@ Returns a set of data points containing the month of the year, the meetup group 
 ```
 
 ##### /analytics/monthlygrowthbytag
+
+![/analytics/monthlygrowthbytag](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/swagger-ui-analytics-get-monthly-growth-by-tag.png "/analytics/monthlygrowthbytag")
 
 Returns a set of data points containing the month of the year, the meetup group tag name, and membership count.
 
@@ -882,6 +886,8 @@ Returns a set of data points containing the month of the year, the meetup group 
 
 ##### /analytics/monthlygrowthbylocation
 
+![/analytics/monthlygrowthbylocation](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/swagger-ui-analytics-get-monthly-growth-by-location.png "/analytics/monthlygrowthbylocation")
+
 Returns a set of data points containing the month of the year, the meetup group tag name, the city, and membership count.
 
 ```javascript
@@ -907,6 +913,8 @@ Returns a set of data points containing the month of the year, the meetup group 
 
 ##### /analytics/groupsbytag
 
+![/analytics/groupsbytag](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/swagger-ui-analytics-get-groups-by-tag.png "/analytics/groupsbytag")
+
 Returns a list of tags and the number of groups per tag.
 
 ```javascript
@@ -929,6 +937,8 @@ Returns a list of tags and the number of groups per tag.
 
 ##### /analytics/cities
 
+![/analytics/cities](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/swagger-ui-analytics-get-cities.png "/analytics/cities")
+
 Returns a distinct list of cities for typeahead.
 
 ```javascript
@@ -946,6 +956,8 @@ Returns a distinct list of cities for typeahead.
 ```
 
 ##### /analytics/countries
+
+![/analytics/countries](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/swagger-ui-analytics-get-countries.png "/analytics/countries")
 
 Returns a distinct list of countries for typeahead.
 
