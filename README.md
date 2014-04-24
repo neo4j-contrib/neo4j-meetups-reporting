@@ -12,6 +12,8 @@ Read the full project documentation here: [Graph-based Analytics Platform Docs](
 
 ## Architecutre
 
+![Graph-based Analytics System Diagram](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/graph-based-analytics-system-diagram.png)
+
 * Front-end web-based dashboard in Node.js and bootstrap
 * REST API via Neo4j Swagger in Node.js
 * Data import services in Node.js
