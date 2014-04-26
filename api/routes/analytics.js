@@ -33,12 +33,216 @@ function parseBool(req, key) {
  * API Specs and Functions
  */
 
-exports.getWeeklyGrowthPercent = {
+ exports.getDailyGrowth = {
     'spec': {
-        "description": "Get weekly growth percent of meetup groups as a time series.",
+        "description": "Get daily growth of meetup groups as a time series.",
+        "path": "/analytics/dailygrowth",
+        "notes": "Returns a set of data points containing the day of the year, the meetup group name, and membership count.",
+        "summary": "Get the time series that models the growth of meetup groups day over day.",
+        "method": "GET",
+        "params": [
+            param.query("startDate", "A date to retrieve results from. Results will be returned for the entire day that the start date occurs within.", "string", true, true),
+            param.query("endDate", "A date to retrieve results until. Results will be returned for the entire day that the start date occurs within.", "string", true, true),
+            param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
+            param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
+        ],
+        "responseClass": "List[Analytics]",
+        "errorResponses": [],
+        "nickname": "getDailyGrowth"
+    },
+    'action': function (req, res) {
+        var options = {
+            neo4j: parseBool(req, 'neo4j')
+        };
+
+        var startDate = parseUrl(req, 'startDate');
+        var endDate = parseUrl(req, 'endDate');
+        var location = parseUrl(req, 'city');
+        var country = parseUrl(req, 'country');
+        var topics = _.invoke(parseUrl(req, 'topics').toLowerCase().split(','), 'trim');
+        var groups = parseUrl(req, 'groups') ? _.invoke(parseUrl(req, 'groups').toLowerCase().split(','), 'trim') : [];
+
+        var dateFrom = new Date(startDate);
+        var dateTo = new Date(endDate);
+
+        var params = {
+            startDate: dateFrom,
+            endDate: dateTo,
+            city: location,
+            country: country,
+            topics: topics,
+            groups: groups
+        };
+
+        var start = new Date();
+        Analytics.getDailyGrowth(params, options, function (err, response) {
+            if (err || !response.results) throw swe.notFound('analytics');
+            writeResponse(res, response, start);
+        });
+    }
+};
+
+exports.getWeeklyGrowth = {
+    'spec': {
+        "description": "Get weekly growth of meetup groups as a time series.",
         "path": "/analytics/weeklygrowth",
-        "notes": "Returns a set of data points containing the week of the year, the meetup group name, and membership count.",
-        "summary": "Get the time series that models the growth percent of meetup groups week over week.",
+        "notes": "Returns a set of data points containing the day of the year, the meetup group name, and membership count.",
+        "summary": "Get the time series that models the growth of meetup groups day over day.",
+        "method": "GET",
+        "params": [
+            param.query("startDate", "A date to retrieve results from. Results will be returned for the entire day that the start date occurs within.", "string", true, true),
+            param.query("endDate", "A date to retrieve results until. Results will be returned for the entire day that the start date occurs within.", "string", true, true),
+            param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
+            param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
+        ],
+        "responseClass": "List[Analytics]",
+        "errorResponses": [],
+        "nickname": "getWeeklyGrowth"
+    },
+    'action': function (req, res) {
+        var options = {
+            neo4j: parseBool(req, 'neo4j')
+        };
+
+        var startDate = parseUrl(req, 'startDate');
+        var endDate = parseUrl(req, 'endDate');
+        var location = parseUrl(req, 'city');
+        var country = parseUrl(req, 'country');
+        var topics = _.invoke(parseUrl(req, 'topics').toLowerCase().split(','), 'trim');
+        var groups = parseUrl(req, 'groups') ? _.invoke(parseUrl(req, 'groups').toLowerCase().split(','), 'trim') : [];
+
+        var dateFrom = new Date(startDate);
+        var dateTo = new Date(endDate);
+
+        var params = {
+            startDate: dateFrom,
+            endDate: dateTo,
+            city: location,
+            country: country,
+            topics: topics,
+            groups: groups
+        };
+
+        var start = new Date();
+        Analytics.getWeeklyGrowth(params, options, function (err, response) {
+            if (err || !response.results) throw swe.notFound('analytics');
+            writeResponse(res, response, start);
+        });
+    }
+};
+
+exports.getMonthlyGrowth = {
+    'spec': {
+        "description": "Get monthly growth of meetup groups as a time series.",
+        "path": "/analytics/monthlygrowth",
+        "notes": "Returns a set of data points containing the month of the year, the meetup group name, and membership count.",
+        "summary": "Get the time series that models the growth of meetup groups month over month.",
+        "method": "GET",
+        "params": [
+            param.query("startDate", "A date to retrieve results from. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
+            param.query("endDate", "A date to retrieve results until. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
+            param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
+            param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
+        ],
+        "responseClass": "List[Analytics]",
+        "errorResponses": [],
+        "nickname": "getMonthlyGrowth"
+    },
+    'action': function (req, res) {
+        var options = {
+            neo4j: parseBool(req, 'neo4j')
+        };
+
+        var startDate = parseUrl(req, 'startDate');
+        var endDate = parseUrl(req, 'endDate');
+        var location = parseUrl(req, 'city');
+        var country = parseUrl(req, 'country');
+        var topics = _.invoke(parseUrl(req, 'topics').toLowerCase().split(','), 'trim');
+        var groups = parseUrl(req, 'groups') ? _.invoke(parseUrl(req, 'groups').toLowerCase().split(','), 'trim') : [];
+
+        var dateFrom = new Date(startDate);
+        var dateTo = new Date(endDate);
+
+        var params = {
+            startDate: dateFrom,
+            endDate: dateTo,
+            city: location,
+            country: country,
+            topics: topics,
+            groups: groups
+        };
+
+        var start = new Date();
+        Analytics.getMonthlyGrowth(params, options, function (err, response) {
+            if (err || !response.results) throw swe.notFound('analytics');
+            writeResponse(res, response, start);
+        });
+    }
+};
+
+exports.getDailyGrowthByTag = {
+    'spec': {
+        "description": "Get daily growth of meetup group tags as a time series.",
+        "path": "/analytics/dailygrowthbytag",
+        "notes": "Returns a set of data points containing the day of the year, the meetup group tag name, and membership count.",
+        "summary": "Get the time series that models the growth of meetup group tags day over day.",
+        "method": "GET",
+        "params": [
+            param.query("startDate", "A date to retrieve results from. Results will be returned for the entire day that the start date occurs within.", "string", true, true),
+            param.query("endDate", "A date to retrieve results until. Results will be returned for the entire day that the start date occurs within.", "string", true, true),
+            param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
+            param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
+        ],
+        "responseClass": "List[Analytics]",
+        "errorResponses": [],
+        "nickname": "getDailyGrowthByTag"
+    },
+    'action': function (req, res) {
+        var options = {
+            neo4j: parseBool(req, 'neo4j')
+        };
+
+        var startDate = parseUrl(req, 'startDate');
+        var endDate = parseUrl(req, 'endDate');
+        var location = parseUrl(req, 'city');
+        var country = parseUrl(req, 'country');
+        var topics = _.invoke(parseUrl(req, 'topics').toLowerCase().split(','), 'trim');
+        var groups = parseUrl(req, 'groups') ? _.invoke(parseUrl(req, 'groups').toLowerCase().split(','), 'trim') : [];
+
+        var dateFrom = new Date(startDate);
+        var dateTo = new Date(endDate);
+
+        var params = {
+            startDate: dateFrom,
+            endDate: dateTo,
+            city: location,
+            country: country,
+            topics: topics,
+            groups: groups
+        };
+
+        var start = new Date();
+        Analytics.getDailyGrowthByTag(params, options, function (err, response) {
+            if (err || !response.results) throw swe.notFound('analytics');
+            writeResponse(res, response, start);
+        });
+    }
+};
+
+exports.getWeeklyGrowthByTag = {
+    'spec': {
+        "description": "Get weekly growth of meetup group tags as a time series.",
+        "path": "/analytics/weeklygrowthbytag",
+        "notes": "Returns a set of data points containing the week of the year, the meetup group tag name, and membership count.",
+        "summary": "Get the time series that models the growth of meetup group tags week over week.",
         "method": "GET",
         "params": [
             param.query("startDate", "A date to retrieve results from. Results will be returned for the entire week that the start date occurs within.", "string", true, true),
@@ -50,7 +254,7 @@ exports.getWeeklyGrowthPercent = {
         ],
         "responseClass": "List[Analytics]",
         "errorResponses": [],
-        "nickname": "getWeeklyGrowthPercent"
+        "nickname": "getWeeklyGrowthByTag"
     },
     'action': function (req, res) {
         var options = {
@@ -77,70 +281,19 @@ exports.getWeeklyGrowthPercent = {
         };
 
         var start = new Date();
-        Analytics.getWeeklyGrowthPercent(params, options, function (err, response) {
+        Analytics.getWeeklyGrowthByTag(params, options, function (err, response) {
             if (err || !response.results) throw swe.notFound('analytics');
             writeResponse(res, response, start);
         });
     }
 };
 
-exports.getMonthlyGrowthPercent = {
+exports.getMonthlyGrowthByTag = {
     'spec': {
-        "description": "Get monthly growth percent of meetup groups as a time series.",
-        "path": "/analytics/monthlygrowth",
-        "notes": "Returns a set of data points containing the month of the year, the meetup group name, and membership count.",
-        "summary": "Get the time series that models the growth percent of meetup groups month over month.",
-        "method": "GET",
-        "params": [
-            param.query("startDate", "A date to retrieve results from. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
-            param.query("endDate", "A date to retrieve results until. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
-            param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
-            param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
-            param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
-            param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
-        ],
-        "responseClass": "List[Analytics]",
-        "errorResponses": [],
-        "nickname": "getMonthlyGrowthPercent"
-    },
-    'action': function (req, res) {
-        var options = {
-            neo4j: parseBool(req, 'neo4j')
-        };
-
-        var startDate = parseUrl(req, 'startDate');
-        var endDate = parseUrl(req, 'endDate');
-        var location = parseUrl(req, 'city');
-        var country = parseUrl(req, 'country');
-        var topics = _.invoke(parseUrl(req, 'topics').toLowerCase().split(','), 'trim');
-        var groups = parseUrl(req, 'groups') ? _.invoke(parseUrl(req, 'groups').toLowerCase().split(','), 'trim') : [];
-
-        var dateFrom = new Date(startDate);
-        var dateTo = new Date(endDate);
-
-        var params = {
-            startDate: dateFrom,
-            endDate: dateTo,
-            city: location,
-            country: country,
-            topics: topics,
-            groups: groups
-        };
-
-        var start = new Date();
-        Analytics.getMonthlyGrowthPercent(params, options, function (err, response) {
-            if (err || !response.results) throw swe.notFound('analytics');
-            writeResponse(res, response, start);
-        });
-    }
-};
-
-exports.getMonthlyGrowthPercentByTag = {
-    'spec': {
-        "description": "Get monthly growth percent of meetup group tags as a time series.",
+        "description": "Get monthly growth of meetup group tags as a time series.",
         "path": "/analytics/monthlygrowthbytag",
         "notes": "Returns a set of data points containing the month of the year, the meetup group tag name, and membership count.",
-        "summary": "Get the time series that models the growth percent of meetup group tags month over month.",
+        "summary": "Get the time series that models the growth of meetup group tags month over month.",
         "method": "GET",
         "params": [
             param.query("startDate", "A date to retrieve results from. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
@@ -152,7 +305,7 @@ exports.getMonthlyGrowthPercentByTag = {
         ],
         "responseClass": "List[Analytics]",
         "errorResponses": [],
-        "nickname": "getMonthlyGrowthPercentByTag"
+        "nickname": "getMonthlyGrowthByTag"
     },
     'action': function (req, res) {
         var options = {
@@ -179,23 +332,23 @@ exports.getMonthlyGrowthPercentByTag = {
         };
 
         var start = new Date();
-        Analytics.getMonthlyGrowthPercentByTag(params, options, function (err, response) {
+        Analytics.getMonthlyGrowthByTag(params, options, function (err, response) {
             if (err || !response.results) throw swe.notFound('analytics');
             writeResponse(res, response, start);
         });
     }
 };
 
-exports.getMonthlyGrowthPercentByLocation = {
+exports.getDailyGrowthByLocation = {
     'spec': {
-        "description": "Get monthly growth percent of meetup group locations and tags as a time series.",
-        "path": "/analytics/monthlygrowthbylocation",
-        "notes": "Returns a set of data points containing the month of the year, the meetup group tag name, the city, and membership count.",
-        "summary": "Get the time series that models the growth percent of meetup group tags month over month, by city.",
+        "description": "Get daily growth of meetup group locations and tags as a time series.",
+        "path": "/analytics/dailygrowthbylocation",
+        "notes": "Returns a set of data points containing the day of the year, the meetup group tag name, the city, and membership count.",
+        "summary": "Get the time series that models the growth of meetup group tags day over day, by city.",
         "method": "GET",
         "params": [
-            param.query("startDate", "A date to retrieve results from. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
-            param.query("endDate", "A date to retrieve results until. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
+            param.query("startDate", "A date to retrieve results from. Results will be returned for the entire day that the start date occurs within.", "string", true, true),
+            param.query("endDate", "A date to retrieve results until. Results will be returned for the entire day that the start date occurs within.", "string", true, true),
             param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
             param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
             param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
@@ -203,7 +356,7 @@ exports.getMonthlyGrowthPercentByLocation = {
         ],
         "responseClass": "List[Analytics]",
         "errorResponses": [],
-        "nickname": "getMonthlyGrowthPercentByTag"
+        "nickname": "getDailyGrowthByTag"
     },
     'action': function (req, res) {
         var options = {
@@ -230,7 +383,109 @@ exports.getMonthlyGrowthPercentByLocation = {
         };
 
         var start = new Date();
-        Analytics.getMonthlyGrowthPercentByLocation(params, options, function (err, response) {
+        Analytics.getDailyGrowthByLocation(params, options, function (err, response) {
+            if (err || !response.results) throw swe.notFound('analytics');
+            writeResponse(res, response, start);
+        });
+    }
+};
+
+exports.getWeeklyGrowthByLocation = {
+    'spec': {
+        "description": "Get weekly growth of meetup group locations and tags as a time series.",
+        "path": "/analytics/weeklygrowthbylocation",
+        "notes": "Returns a set of data points containing the week of the year, the meetup group tag name, the city, and membership count.",
+        "summary": "Get the time series that models the growth of meetup group tags week over week, by city.",
+        "method": "GET",
+        "params": [
+            param.query("startDate", "A date to retrieve results from. Results will be returned for the entire week that the start date occurs within.", "string", true, true),
+            param.query("endDate", "A date to retrieve results until. Results will be returned for the entire week that the start date occurs within.", "string", true, true),
+            param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
+            param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
+        ],
+        "responseClass": "List[Analytics]",
+        "errorResponses": [],
+        "nickname": "getWeeklyGrowthByTag"
+    },
+    'action': function (req, res) {
+        var options = {
+            neo4j: parseBool(req, 'neo4j')
+        };
+
+        var startDate = parseUrl(req, 'startDate');
+        var endDate = parseUrl(req, 'endDate');
+        var location = parseUrl(req, 'city');
+        var country = parseUrl(req, 'country');
+        var topics = _.invoke(parseUrl(req, 'topics').toLowerCase().split(','), 'trim');
+        var groups = parseUrl(req, 'groups') ? _.invoke(parseUrl(req, 'groups').toLowerCase().split(','), 'trim') : [];
+
+        var dateFrom = new Date(startDate);
+        var dateTo = new Date(endDate);
+
+        var params = {
+            startDate: dateFrom,
+            endDate: dateTo,
+            city: location,
+            country: country,
+            topics: topics,
+            groups: groups
+        };
+
+        var start = new Date();
+        Analytics.getWeeklyGrowthByLocation(params, options, function (err, response) {
+            if (err || !response.results) throw swe.notFound('analytics');
+            writeResponse(res, response, start);
+        });
+    }
+};
+
+exports.getMonthlyGrowthByLocation = {
+    'spec': {
+        "description": "Get monthly growth of meetup group locations and tags as a time series.",
+        "path": "/analytics/monthlygrowthbylocation",
+        "notes": "Returns a set of data points containing the month of the year, the meetup group tag name, the city, and membership count.",
+        "summary": "Get the time series that models the growth of meetup group tags month over month, by city.",
+        "method": "GET",
+        "params": [
+            param.query("startDate", "A date to retrieve results from. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
+            param.query("endDate", "A date to retrieve results until. Results will be returned for the entire month that the start date occurs within.", "string", true, true),
+            param.query("city", "The city name where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("country", "The country code where a meetup group resides. This field is case sensitive. Leave blank to query on world-wide meetup groups.", "string", false, true),
+            param.query("topics", "A list of topics that a meetup group must have to be returned in the result set. Multiple topic names should be delimited by a comma.", "string", true, true),
+            param.query("groups", "A list of names to match on meetup groups, only groups with the name that are specified in the list are returned. Multiple topic names should be delimited by a comma. Leave blank to ignore this field.", "string", false, false)
+        ],
+        "responseClass": "List[Analytics]",
+        "errorResponses": [],
+        "nickname": "getMonthlyGrowthByTag"
+    },
+    'action': function (req, res) {
+        var options = {
+            neo4j: parseBool(req, 'neo4j')
+        };
+
+        var startDate = parseUrl(req, 'startDate');
+        var endDate = parseUrl(req, 'endDate');
+        var location = parseUrl(req, 'city');
+        var country = parseUrl(req, 'country');
+        var topics = _.invoke(parseUrl(req, 'topics').toLowerCase().split(','), 'trim');
+        var groups = parseUrl(req, 'groups') ? _.invoke(parseUrl(req, 'groups').toLowerCase().split(','), 'trim') : [];
+
+        var dateFrom = new Date(startDate);
+        var dateTo = new Date(endDate);
+
+        var params = {
+            startDate: dateFrom,
+            endDate: dateTo,
+            city: location,
+            country: country,
+            topics: topics,
+            groups: groups
+        };
+
+        var start = new Date();
+        Analytics.getMonthlyGrowthByLocation(params, options, function (err, response) {
             if (err || !response.results) throw swe.notFound('analytics');
             writeResponse(res, response, start);
         });

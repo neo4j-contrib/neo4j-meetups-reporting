@@ -66,13 +66,18 @@ var models = require("./models/swagger_models");
 
 // Add models and methods to swagger
 swagger.addModels(models)
-  .addGet(routes.analytics.getWeeklyGrowthPercent)
-  .addGet(routes.analytics.getMonthlyGrowthPercent)
-  .addGet(routes.analytics.getMonthlyGrowthPercentByTag)
+  .addGet(routes.analytics.getDailyGrowth)
+  .addGet(routes.analytics.getWeeklyGrowth)
+  .addGet(routes.analytics.getMonthlyGrowth)
+  .addGet(routes.analytics.getDailyGrowthByTag)
+  .addGet(routes.analytics.getWeeklyGrowthByTag)
+  .addGet(routes.analytics.getMonthlyGrowthByTag)
   .addGet(routes.analytics.getCities)
   .addGet(routes.analytics.getCountries)
   .addGet(routes.analytics.getGroupCountByTag)
-  .addGet(routes.analytics.getMonthlyGrowthPercentByLocation)
+  .addGet(routes.analytics.getDailyGrowthByLocation)
+  .addGet(routes.analytics.getWeeklyGrowthByLocation)
+  .addGet(routes.analytics.getMonthlyGrowthByLocation)
 
 
 // Configures the app's base path and api version.

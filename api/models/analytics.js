@@ -42,6 +42,18 @@ var randomName = require('random-name');
   callback(null, countriesArray);
 };
 
+var _dailyGrowthStatistics = function (results, callback) {
+  var analytics = _.map(results, function (result) {
+    var thisAnalytics = {};
+    thisAnalytics.day = result.day;
+    thisAnalytics.group = result.group;
+    thisAnalytics.members = result.members;
+    return thisAnalytics;
+  });
+
+  callback(null, analytics);
+};
+
 var _weeklyGrowthStatistics = function (results, callback) {
   var analytics = _.map(results, function (result) {
     var thisAnalytics = {};
@@ -66,11 +78,61 @@ var _monthlyGrowthStatistics = function (results, callback) {
   callback(null, analytics);
 };
 
+var _dailyGrowthStatisticsByTag = function (results, callback) {
+  var analytics = _.map(results, function (result) {
+    var thisAnalytics = {};
+    thisAnalytics.date = result.day;
+    thisAnalytics.tag = result.tag;
+    thisAnalytics.members = result.members;
+    return thisAnalytics;
+  });
+
+  callback(null, analytics);
+};
+
+var _weeklyGrowthStatisticsByTag = function (results, callback) {
+  var analytics = _.map(results, function (result) {
+    var thisAnalytics = {};
+    thisAnalytics.date = result.week;
+    thisAnalytics.tag = result.tag;
+    thisAnalytics.members = result.members;
+    return thisAnalytics;
+  });
+
+  callback(null, analytics);
+};
+
 var _monthlyGrowthStatisticsByTag = function (results, callback) {
   var analytics = _.map(results, function (result) {
     var thisAnalytics = {};
-    thisAnalytics.month = result.month;
+    thisAnalytics.date = result.month;
     thisAnalytics.tag = result.tag;
+    thisAnalytics.members = result.members;
+    return thisAnalytics;
+  });
+
+  callback(null, analytics);
+};
+
+var _dailyGrowthStatisticsByLocation = function (results, callback) {
+  var analytics = _.map(results, function (result) {
+    var thisAnalytics = {};
+    thisAnalytics.day = result.day;
+    thisAnalytics.tag = result.tag;
+    thisAnalytics.city = result.city;
+    thisAnalytics.members = result.members;
+    return thisAnalytics;
+  });
+
+  callback(null, analytics);
+};
+
+var _weeklyGrowthStatisticsByLocation = function (results, callback) {
+  var analytics = _.map(results, function (result) {
+    var thisAnalytics = {};
+    thisAnalytics.week = result.week;
+    thisAnalytics.tag = result.tag;
+    thisAnalytics.city = result.city;
     thisAnalytics.members = result.members;
     return thisAnalytics;
   });
@@ -110,7 +172,7 @@ var _groupCountByTag = function(results, callback) {
  *  to be combined with result functions using _.partial()
  */
 
-var _getWeeklyGrowthPercent = function (params, options, callback) {
+var _getDailyGrowth = function (params, options, callback) {
   var cypher_params = {
     startDate: getTicks(params.startDate),
     endDate: getTicks(params.endDate),
@@ -120,10 +182,33 @@ var _getWeeklyGrowthPercent = function (params, options, callback) {
     groups: params.groups
   };
   var query = [
-    'MATCH (d:Day)<-[:HAS_DAY]-(month:Month)',
-    'WHERE d.timestamp > { startDate } AND d.timestamp < { endDate }',
-    'WITH DISTINCT month',
-    'MATCH (month:Month)-[:HAS_DAY]->(day:Day { dayofweek: 1 })',
+    'MATCH (day:Day)',
+    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
+    'WHERE tag.tag in { topics }',
+    'WITH tag, location, day',
+    'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day',
+    'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as day, group.name as group, stats.count as members, day as time',
+    'ORDER BY time.timestamp',
+    'RETURN day, group, members'
+  ].join('\n');
+
+  callback(null, query, cypher_params);
+};
+
+var _getWeeklyGrowth = function (params, options, callback) {
+  var cypher_params = {
+    startDate: getTicks(params.startDate),
+    endDate: getTicks(params.endDate),
+    city: params.city,
+    country: params.country,
+    topics: params.topics,
+    groups: params.groups
+  };
+  var query = [
+    'MATCH (day:Day { dayofweek: 1 })',
+    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
     'WHERE tag.tag in { topics }',
     'WITH tag, location, day',
@@ -137,7 +222,7 @@ var _getWeeklyGrowthPercent = function (params, options, callback) {
   callback(null, query, cypher_params);
 };
 
-var _getMonthlyGrowthPercent = function (params, options, callback) {
+var _getMonthlyGrowth = function (params, options, callback) {
   var cypher_params = {
     startDate: getTicks(params.startDate),
     endDate: getTicks(params.endDate),
@@ -164,7 +249,7 @@ var _getMonthlyGrowthPercent = function (params, options, callback) {
   callback(null, query, cypher_params);
 };
 
-var _getMonthlyGrowthPercentByTag = function (params, options, callback) {
+var _getDailyGrowthByTag = function (params, options, callback) {
   var cypher_params = {
     startDate: getTicks(params.startDate),
     endDate: getTicks(params.endDate),
@@ -174,10 +259,58 @@ var _getMonthlyGrowthPercentByTag = function (params, options, callback) {
     groups: params.groups
   };
   var query = [
-    'MATCH (d:Day)<-[:HAS_DAY]-(month:Month)',
-    'WHERE d.timestamp > { startDate } AND d.timestamp < { endDate }',
-    'WITH DISTINCT month',
-    'MATCH (month:Month)-[:HAS_DAY]->(day:Day { day: 1 })',
+    'MATCH (day:Day)',
+    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
+    'WHERE tag.tag in { topics }',
+    'WITH tag, location, day',
+    'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag',
+    'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as day, tag.tag as tag, sum(stats.count) as members, day as time',
+    'ORDER BY time.timestamp',
+    'RETURN day, tag, members'
+  ].join('\n');
+
+  callback(null, query, cypher_params);
+};
+
+var _getWeeklyGrowthByTag = function (params, options, callback) {
+  var cypher_params = {
+    startDate: getTicks(params.startDate),
+    endDate: getTicks(params.endDate),
+    city: params.city,
+    country: params.country,
+    topics: params.topics,
+    groups: params.groups
+  };
+  var query = [
+    'MATCH (day:Day { dayofweek: 1 })',
+    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
+    'WHERE tag.tag in { topics }',
+    'WITH tag, location, day',
+    'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag',
+    'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as week, tag.tag as tag, sum(stats.count) as members, day',
+    'ORDER BY day.timestamp',
+    'RETURN week, tag, members'
+  ].join('\n');
+
+  callback(null, query, cypher_params);
+};
+
+var _getMonthlyGrowthByTag = function (params, options, callback) {
+  var cypher_params = {
+    startDate: getTicks(params.startDate),
+    endDate: getTicks(params.endDate),
+    city: params.city,
+    country: params.country,
+    topics: params.topics,
+    groups: params.groups
+  };
+  var query = [
+    'MATCH (day:Day { day: 1 })',
+    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
     'WHERE tag.tag in { topics }',
     'WITH tag, location, day',
@@ -191,7 +324,57 @@ var _getMonthlyGrowthPercentByTag = function (params, options, callback) {
   callback(null, query, cypher_params);
 };
 
-var _getMonthlyGrowthPercentByLocation = function (params, options, callback) {
+var _getDailyGrowthByLocation = function (params, options, callback) {
+  var cypher_params = {
+    startDate: getTicks(params.startDate),
+    endDate: getTicks(params.endDate),
+    city: params.city,
+    country: params.country,
+    topics: params.topics,
+    groups: params.groups
+  };
+  var query = [
+    'MATCH (day:Day)',
+    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
+    'WHERE tag.tag in { topics }',
+    'WITH tag, location, day',
+    'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag, location',
+    'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as day, location.city as city, tag.tag as tag, sum(stats.count) as members, day as time',
+    'ORDER BY time.timestamp',
+    'RETURN day, tag, members, city'
+  ].join('\n');
+
+  callback(null, query, cypher_params);
+};
+
+var _getWeeklyGrowthByLocation = function (params, options, callback) {
+  var cypher_params = {
+    startDate: getTicks(params.startDate),
+    endDate: getTicks(params.endDate),
+    city: params.city,
+    country: params.country,
+    topics: params.topics,
+    groups: params.groups
+  };
+  var query = [
+    'MATCH (day:Day { dayofweek: 1 })',
+    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
+    'WHERE tag.tag in { topics }',
+    'WITH tag, location, day',
+    'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag, location',
+    'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as week, location.city as city, tag.tag as tag, sum(stats.count) as members, day',
+    'ORDER BY day.timestamp',
+    'RETURN week, tag, members, city'
+  ].join('\n');
+
+  callback(null, query, cypher_params);
+};
+
+var _getMonthlyGrowthByLocation = function (params, options, callback) {
   var cypher_params = {
     startDate: getTicks(params.startDate),
     endDate: getTicks(params.endDate),
@@ -256,20 +439,30 @@ var _getCountries = function (params, options, callback) {
  *  a wrapper function that combines both the result functions with query functions
  */
 
-var getWeeklyGrowthPercent = Cypher(_getWeeklyGrowthPercent, _weeklyGrowthStatistics);
-var getMonthlyGrowthPercent = Cypher(_getMonthlyGrowthPercent, _monthlyGrowthStatistics);
-var getMonthlyGrowthPercentByTag = Cypher(_getMonthlyGrowthPercentByTag, _monthlyGrowthStatisticsByTag);
-var getMonthlyGrowthPercentByLocation = Cypher(_getMonthlyGrowthPercentByLocation, _monthlyGrowthStatisticsByLocation);
+var getDailyGrowth = Cypher(_getDailyGrowth, _dailyGrowthStatistics);
+var getWeeklyGrowth = Cypher(_getWeeklyGrowth, _weeklyGrowthStatistics);
+var getMonthlyGrowth = Cypher(_getMonthlyGrowth, _monthlyGrowthStatistics);
+var getDailyGrowthByTag = Cypher(_getDailyGrowthByTag, _dailyGrowthStatisticsByTag);
+var getWeeklyGrowthByTag = Cypher(_getWeeklyGrowthByTag, _weeklyGrowthStatisticsByTag);
+var getMonthlyGrowthByTag = Cypher(_getMonthlyGrowthByTag, _monthlyGrowthStatisticsByTag);
+var getDailyGrowthByLocation = Cypher(_getDailyGrowthByLocation, _dailyGrowthStatisticsByLocation);
+var getWeeklyGrowthByLocation = Cypher(_getWeeklyGrowthByLocation, _weeklyGrowthStatisticsByLocation);
+var getMonthlyGrowthByLocation = Cypher(_getMonthlyGrowthByLocation, _monthlyGrowthStatisticsByLocation);
 var getCities = Cypher(_getCities, _cities);
 var getCountries = Cypher(_getCountries, _countries);
 var getGroupCountByTag = Cypher(_getGroupsByTag, _groupCountByTag);
 
 // export exposed functions
 module.exports = {
-  getWeeklyGrowthPercent: getWeeklyGrowthPercent,
-  getMonthlyGrowthPercent: getMonthlyGrowthPercent,
-  getMonthlyGrowthPercentByTag: getMonthlyGrowthPercentByTag,
-  getMonthlyGrowthPercentByLocation: getMonthlyGrowthPercentByLocation,
+  getDailyGrowth: getDailyGrowth,
+  getWeeklyGrowth: getWeeklyGrowth,
+  getMonthlyGrowth: getMonthlyGrowth,
+  getDailyGrowthByTag: getDailyGrowthByTag,
+  getWeeklyGrowthByTag: getWeeklyGrowthByTag,
+  getMonthlyGrowthByTag: getMonthlyGrowthByTag,
+  getDailyGrowthByLocation: getDailyGrowthByLocation,
+  getWeeklyGrowthByLocation: getWeeklyGrowthByLocation,
+  getMonthlyGrowthByLocation: getMonthlyGrowthByLocation,
   getCities: getCities,
   getCountries: getCountries,
   getGroupCountByTag: getGroupCountByTag

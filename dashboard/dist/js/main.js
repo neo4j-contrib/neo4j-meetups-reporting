@@ -553,7 +553,7 @@ var getTagReport = function (from, to) {
         var seriesName = [];
 
         $.each(data, function (key, val) {
-            categoryArr.push(val.month);
+            categoryArr.push(val.date);
             seriesName.push(val.tag);
         });
 
@@ -568,7 +568,7 @@ var getTagReport = function (from, to) {
             $.each(data, function (key, val) {
                 if (val.tag == item) {
                     dataPointsArr = [];
-                    var thisDateTime = new Date(val.month);
+                    var thisDateTime = new Date(val.date);
                     var utcDateTime = Date.UTC(thisDateTime.getUTCFullYear(), thisDateTime.getUTCMonth(), thisDateTime.getUTCDate());
                     dataPointsArr.push(utcDateTime);
                     dataPointsArr.push(val.members);
@@ -591,7 +591,7 @@ var getTagReport = function (from, to) {
             series.push({
                 name: item,
                 data: dataPointPercent
-            })
+            });
 
             // Only measure annual percent growth for groups older than a year
           
@@ -607,6 +607,7 @@ var getTagReport = function (from, to) {
         });
 
         
+        console.log(series);
 
         buildTagChart(categories, series);        
         $(".donut-chart").empty();
@@ -662,7 +663,7 @@ var getLocationReport = function (from, to) {
         var seriesName = [];
 
         $.each(data, function (key, val) {
-            categoryArr.push(val.month);
+            categoryArr.push(val.date);
             if ($.inArray((val.tag + "|" + val.city), seriesName.map(function(d) { return d.tag + "|" + d.city; })) == -1)
             {
                 seriesName.push({ tag: val.tag, city: val.city });
@@ -670,9 +671,7 @@ var getLocationReport = function (from, to) {
         });
 
         categories = categoryArr.getUnique();
-        console.log(seriesName);
         var names = seriesName;
-        console.log(names);
 
         $.each(names, function (i, item) {
             var dataPoints = [];
@@ -682,7 +681,7 @@ var getLocationReport = function (from, to) {
             $.each(data, function (key, val) {
                 if (val.tag == item.tag && val.city == item.city) {
                     dataPointsArr = [];
-                    var thisDateTime = new Date(val.month);
+                    var thisDateTime = new Date(val.date);
                     var utcDateTime = Date.UTC(thisDateTime.getUTCFullYear(), thisDateTime.getUTCMonth(), thisDateTime.getUTCDate());
                     dataPointsArr.push(utcDateTime);
                     dataPointsArr.push(val.members);
