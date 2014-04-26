@@ -720,23 +720,26 @@ var getLocationReport = function (from, to) {
         
         var uniqueTags = seriesVariance.map(function(d) { return d.name; }).getUnique();
         var tableTemplate = '<div class="panel panel-default"><div class="panel-heading">%name%</div><table class="table table-striped table-result-view-tag"><thead><tr><th style="padding-left: 1em;">City</th><th>Growth</th></tr></thead><tbody class="%tag% .growth-table"></tbody></table></div>';
+        console.log(uniqueTags);
         $.each(uniqueTags, function(a, b)
         {
             $.each(seriesVariance, function (key, val) {
-                if (val.name == b) {
-                var items = [];
-                
-                items.push("<tr><td class='growth-table-city'>" + val.city + "</td>")
-                items.push("<td>" + numeral(val.data).format('0%') + "</td>");
-                items.push("</tr>");
-                if($("." + b).length == 0)
-                {
-                var newTable = $(tableTemplate.replace("%tag%", b).replace("%name%", b));
-                $(".table-responsive").append(newTable);
-            };
+                if (val.name == b.replace("-", " ")) {
+                    b = b.replace(" ", "-");
+                    console.log(val);
+                    var items = [];
+                    
+                    items.push("<tr><td class='growth-table-city'>" + val.city + "</td>")
+                    items.push("<td>" + numeral(val.data).format('0%') + "</td>");
+                    items.push("</tr>");
+                    if($("." + b).length == 0)
+                    {
+                        var newTable = $(tableTemplate.replace("%tag%", b).replace("%name%", b.replace("-", " ")));
+                        $(".table-responsive").append(newTable);
+                    };
 
-            $("." + b). append(items.join());
-            }
+                    $("." + b). append(items.join());
+                }
             });
         });
 
