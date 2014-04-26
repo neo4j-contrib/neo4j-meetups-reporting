@@ -139,7 +139,7 @@ $(function () {
             title: {
                 style: {
                     color: '#333',
-                    font: 'bold 12px "Open Sans", sans-serif'
+                    font: 'normal 12px "Open Sans", sans-serif'
                 }
             }
         },
@@ -165,13 +165,16 @@ $(function () {
         },
         legend: {
             itemStyle: {
-                color: '#333'
+                color: '#333',
+                font: 'normal 12px "Open Sans", sans-serif'
             },
             itemHoverStyle: {
-                color: '#428BCA'
+                color: '#428BCA',
+                font: 'normal 12px "Open Sans", sans-serif'
             },
             itemHiddenStyle: {
-                color: '#CCC'
+                color: '#CCC',
+                font: 'normal 12px "Open Sans", sans-serif'
             }
         },
         labels: {
