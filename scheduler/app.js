@@ -2,29 +2,9 @@ var importer = require('./import/importer');
 var url = require("url");
 var _ = require('underscore');
 var meetup = require('meetup-api')('4b1b7a4c4027718192d1e73723135b');
-var express = require('express');
-var app = express();
-
-var env = process.env.NODE_ENV || 'development';
-if ('development' == env) {
-    app.use('/dist/assets', express.static(__dirname + '/dist/assets'));
-    app.use(express.static(__dirname + '/dist'));
-}
-
-// var port = process.env.PORT || 3001;
-// app.listen(port, function () {
-//     console.log("Listening on " + port);
-// });
-
-
-function writeResponse(res, response, start) {
-    res.header('Duration-ms', new Date() - start);
-    if (response.neo4j) {
-        res.header('Neo4j', JSON.stringify(response.neo4j));
-    }
-    res.send(JSON.stringify(response.results));
-}
-
+var geocoder = require('geocoder');
+var geoLocationCache = [];
+ 
 function parseUrl(req, key) {
     return url.parse(req.url, true).query[key];
 }
@@ -36,6 +16,8 @@ function parseBool(req, key) {
 var cities = getPollingCities();
 iteratorCityCallback(0, cities.length, cities);
 
+
+
 function iteratorCityCallback(count, length, cities) {
     if (count < length) {
         // Get the city for this iteration
@@ -44,11 +26,12 @@ function iteratorCityCallback(count, length, cities) {
         // Import group stats for day
         meetup.getGroups({
             'topic': 'NoSQL',
-            'country': city.country,
+            'country': city.countryCode,
             'city': city.city,
             'state': city.state,
             'page': '100'
         }, function (err, groups) {
+            // Call the iterator callback to iterate the data import process sequentially
             iteratorGroupCallback(0, groups.results.length, groups.results, count, length, cities);
         });
     }
@@ -59,134 +42,205 @@ function iteratorCityCallback(count, length, cities) {
     }
 }
 
+function geoCodeCallback(count, length, groups, city_count, city_length, cities) {
+    var key = getGeoLocationKey(groups[count]);
+
+    return function(err, data) {
+        if (!err) {
+            var coordinates = data.results[0].geometry.location;
+            geoLocationCache[key] = { lat: coordinates.lat, lon: coordinates.lng };
+        }
+        else
+        {
+            return { lat: '', lon: '' };
+        }
+
+        importGroupStats(count, length, groups, city_count, city_length, cities);       
+    };
+};
+
+function importGroupStats(count, length, groups, city_count, city_length, cities)
+{
+    // Get parameters from Meetup API
+    var params = getGroupImportParameters(groups[count], cities[city_count]);
+
+    // Format parameters for Cypher REST API
+    params = {
+        'csvLine': params
+    };
+
+    var options = {
+        neo4j: "neo4j"
+    };
+
+    // Import group stats for day
+    importer.importGroupStats(params, options, function (err, response) {
+        // Write the group name to the console
+        console.log(response.results[0].name);
+
+        iteratorGroupCallback(count + 1, length, groups, city_count, city_length, cities);
+    });
+}
+
 function iteratorGroupCallback(count, length, groups, city_count, city_length, cities) {
     if (count < length) {
-        // Get parameters from Meetup API
-        var params = getGroupImportParameters(groups[count]);
+        var group = groups[count];
+        var key = getGeoLocationKey(group);
 
-        // Format parameters for Cypher REST API
-        params = {
-            'csvLine': params
-        };
+        //Check geo location cache
+        if (!geoLocationCache[key]) {
+            var callback = geoCodeCallback(count, length, groups, city_count, city_length, cities);
+            console.log(key);
+            getCityGeocode(groups[count], callback);
+        }
+        else
+        {
+            importGroupStats(count, length, groups, city_count, city_length, cities);   
+        }
 
-        var options = {
-            neo4j: "neo4j"
-        };
-
-        // Import group stats for day
-        importer.importGroupStats(params, options, function (err, response) {
-            // Write the group name to the console
-            console.log(response.results[0].name);
-
-            // Call the iterator callback to iterate the data import process sequentially
-            iteratorGroupCallback(count + 1, length, groups, city_count, city_length, cities);
-        });
     } else {
         iteratorCityCallback(city_count + 1, city_length, cities);
     }
+}
+
+function getGeoLocationKey(group)
+{
+    return group.city + ", " + (group.state ? group.state : group.country);
+}
+
+function getCityGeocode(group, callback)
+{
+    var key = getGeoLocationKey(group);
+    return geocoder.geocode(key, callback);
 }
 
 function getPollingCities() {
     var cities = [{
         city: "New York",
         state: "NY",
-        country: "US"
+        countryCode: "US",
+        countryName: "United States"
     }, {
         city: "Boston",
         state: "MA",
-        country: "US"
+        countryCode: "US",
+        countryName: "United States"
     }, {
         city: "Atlanta",
         state: "GA",
-        country: "US"
+        countryCode: "US",
+        countryName: "United States"
     }, {
         city: "Seattle",
         state: "WA",
-        country: "US"
+        countryCode: "US",
+        countryName: "United States"
     }, {
         city: "Los Angeles",
         state: "CA",
-        country: "US"
+        countryCode: "US",
+        countryName: "United States"
     }, {
         city: "San Francisco",
         state: "CA",
-        country: "US"
+        countryCode: "US",
+        countryName: "United States"
     }, {
         city: "Chicago",
         state: "IL",
-        country: "US"
+        countryCode: "US",
+        countryName: "United States"
     }, {
         city: "Austin",
         state: "TX",
-        country: "US"
+        countryCode: "US",
+        countryName: "United States"
     }, {
         city: "Dallas",
         state: "TX",
-        country: "US"
+        countryCode: "US",
+        countryName: "United States"
     }, {
         city: "Denver",
         state: "CO",
-        country: "US"
+        countryCode: "US",
+        countryName: "United States"
     }, {
         city: "Washington",
         state: "DC",
-        country: "US"
+        countryCode: "US",
+        countryName: "United States"
     }, {
         city: "London",
         state: "",
-        country: "GB"
+        countryCode: "GB",
+        countryName: "Great Britain"
     }, {
         city: "Paris",
         state: "",
-        country: "FR"
+        countryCode: "FR",
+        countryName: "France"
     }, {
         city: "München",
         state: "",
-        country: "DE"
+        countryCode: "DE",
+        countryName: "Germany"
     }, {
         city: "Berlin",
         state: "",
-        country: "DE"
+        countryCode: "DE",
+        countryName: "Germany"
     }, {
         city: "Copenhagen",
         state: "",
-        country: "DK"
+        countryCode: "DK",
+        countryName: "Denmark"
     }, {
         city: "Stockholm",
         state: "",
-        country: "SE"
+        countryCode: "SE",
+        countryName: "Sweden"
     }, {
         city: "Malmö",
         state: "",
-        country: "SE"
+        countryCode: "SE",
+        countryName: "Sweden"
     }, {
         city: "Brussels",
         state: "",
-        country: "BE"
+        countryCode: "BE",
+        countryName: "Belgium"
     }, {
         city: "Frankfurt",
         state: "",
-        country: "DE"
+        countryCode: "DE",
+        countryName: "Germany"
     }, {
         city: "Hamburg",
         state: "",
-        country: "DE"
+        countryCode: "DE",
+        countryName: "Germany"
     }, {
         city: "Oslo",
         state: "",
-        country: "NO"
+        countryCode: "NO",
+        countryName: "Norway"
     }];
 
     return cities;
 }
 
-function getGroupImportParameters(group) {
+function getGroupImportParameters(group, city) {
 
     var createdDate = getDateTimeFromUnix(group.created);
     var today = new Date();
     today = new Date((today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear());
     var yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
+
+    var key = getGeoLocationKey(group);
+
+    
 
     var csvLine = {
         group_name: group.name,
@@ -196,9 +250,12 @@ function getGroupImportParameters(group) {
         group_creation_date_day: createdDate.day,
         group_location: group.city,
         group_country: group.country,
+        group_country_name: city.countryName,
+        group_location_lat: geoLocationCache[key].lat,
+        group_location_lon: geoLocationCache[key].lon,
         group_state: group.state,
         group_tag: group.topics.map(function (d) {
-            return d.name;
+            return [d.name.toLowerCase(), d.name];
         }),
         last_month: yesterday.getMonth() + 1,
         last_day: yesterday.getDate(),
@@ -209,8 +266,11 @@ function getGroupImportParameters(group) {
         year: today.getFullYear(),
         day_timestamp: getTicks(today),
         day_of_week: today.getDay() + 1,
-        week_of_year: getWeekOfYear(today)
+        week_of_year: getWeekOfYear(today),
+        lat: group.lat,
+        lon: group.lon
     };
+
     return csvLine;
 }
 

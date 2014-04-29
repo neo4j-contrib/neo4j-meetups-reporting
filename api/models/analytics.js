@@ -120,6 +120,8 @@ var _dailyGrowthStatisticsByLocation = function (results, callback) {
     thisAnalytics.day = result.day;
     thisAnalytics.tag = result.tag;
     thisAnalytics.city = result.city;
+    thisAnalytics.lat = result.lat;
+    thisAnalytics.lon = result.lon;
     thisAnalytics.members = result.members;
     return thisAnalytics;
   });
@@ -133,6 +135,8 @@ var _weeklyGrowthStatisticsByLocation = function (results, callback) {
     thisAnalytics.week = result.week;
     thisAnalytics.tag = result.tag;
     thisAnalytics.city = result.city;
+    thisAnalytics.lat = result.lat;
+    thisAnalytics.lon = result.lon;
     thisAnalytics.members = result.members;
     return thisAnalytics;
   });
@@ -146,6 +150,8 @@ var _monthlyGrowthStatisticsByLocation = function (results, callback) {
     thisAnalytics.month = result.month;
     thisAnalytics.tag = result.tag;
     thisAnalytics.city = result.city;
+    thisAnalytics.lat = result.lat;
+    thisAnalytics.lon = result.lon;
     thisAnalytics.members = result.members;
     return thisAnalytics;
   });
@@ -266,7 +272,7 @@ var _getDailyGrowthByTag = function (params, options, callback) {
     'WITH tag, location, day',
     'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag',
     'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
-    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as day, tag.tag as tag, sum(stats.count) as members, day as time',
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as day, tag.name as tag, sum(stats.count) as members, day as time',
     'ORDER BY time.timestamp',
     'RETURN day, tag, members'
   ].join('\n');
@@ -291,7 +297,7 @@ var _getWeeklyGrowthByTag = function (params, options, callback) {
     'WITH tag, location, day',
     'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag',
     'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
-    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as week, tag.tag as tag, sum(stats.count) as members, day',
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as week, tag.name as tag, sum(stats.count) as members, day',
     'ORDER BY day.timestamp',
     'RETURN week, tag, members'
   ].join('\n');
@@ -316,7 +322,7 @@ var _getMonthlyGrowthByTag = function (params, options, callback) {
     'WITH tag, location, day',
     'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag',
     'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
-    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as month, tag.tag as tag, sum(stats.count) as members, day',
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as month, tag.name as tag, sum(stats.count) as members, day',
     'ORDER BY day.timestamp',
     'RETURN month, tag, members'
   ].join('\n');
@@ -341,9 +347,9 @@ var _getDailyGrowthByLocation = function (params, options, callback) {
     'WITH tag, location, day',
     'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag, location',
     'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
-    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as day, location.city as city, tag.tag as tag, sum(stats.count) as members, day as time',
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as day, location.city as city, tag.name as tag, sum(stats.count) as members, day as time, location.lat as lat, location.lon as lon',
     'ORDER BY time.timestamp',
-    'RETURN day, tag, members, city'
+    'RETURN day, tag, members, city, coalesce(lat, "") as lat, coalesce(lon, "") as lon'
   ].join('\n');
 
   callback(null, query, cypher_params);
@@ -366,9 +372,9 @@ var _getWeeklyGrowthByLocation = function (params, options, callback) {
     'WITH tag, location, day',
     'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag, location',
     'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
-    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as week, location.city as city, tag.tag as tag, sum(stats.count) as members, day',
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as week, location.city as city, tag.name as tag, sum(stats.count) as members, day, location.lat as lat, location.lon as lon',
     'ORDER BY day.timestamp',
-    'RETURN week, tag, members, city'
+    'RETURN week, tag, members, city, coalesce(lat, "") as lat, coalesce(lon, "") as lon'
   ].join('\n');
 
   callback(null, query, cypher_params);
@@ -393,9 +399,9 @@ var _getMonthlyGrowthByLocation = function (params, options, callback) {
     'WITH tag, location, day',
     'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location) WITH DISTINCT group, day, tag, location',
     'MATCH (group)-[:HAS_MEMBERS]->(stats:Stats)-[:ON_DAY]->(day)' + (params.groups.length > 0 ? ' WHERE group.name in { groups }' : ''),
-    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as month, location.city as city, tag.tag as tag, sum(stats.count) as members, day',
+    'WITH DISTINCT (day.month + "/" + day.day + "/" + day.year) as month, location.city as city, tag.name as tag, sum(stats.count) as members, day, location.lat as lat, location.lon as lon',
     'ORDER BY day.timestamp',
-    'RETURN month, tag, members, city'
+    'RETURN month, tag, members, city, coalesce(lat, "") as lat, coalesce(lon, "") as lon'
   ].join('\n');
 
   callback(null, query, cypher_params);
@@ -407,7 +413,7 @@ var _getGroupsByTag = function (params, options, callback) {
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
     'WHERE tag.tag in { tags }',
     'MATCH (tag)<-[:HAS_TAG]-(group:Group)-[:LOCATED_IN]->(location)',
-    'RETURN tag.tag as tag, count(group) as count'
+    'RETURN tag.name as tag, count(group) as count'
   ].join('\n');
 
   callback(null, query, params);

@@ -93,8 +93,7 @@ function onSelected($e, datum) {
 $(function () {
 
     Highcharts.theme = {
-        colors: ["#F25A29", "#AD62CE", "#30B6AF", "#FCC940", "#FF6C7C", "#4356C0", "#DFE1E3"
-        ],
+        colors: ["#F25A29", "#AD62CE", "#30B6AF", "#FCC940", "#FF6C7C", "#4356C0", "#DFE1E3"],
         chart: {
             backgroundColor: {
                 linearGradient: {
@@ -606,9 +605,6 @@ var getTagReport = function (from, to) {
             return b.data - a.data
         });
 
-        
-        console.log(series);
-
         buildTagChart(categories, series);        
         $(".donut-chart").empty();
 
@@ -634,7 +630,7 @@ var getTagReport = function (from, to) {
         buildArcChart(arcSeries, 'arc-container', 'Relative Growth %', 'Cumulative Growth', '{series.name}: <b>{point.percentage:.1f}%</b>');
     });
 
-  $.getJSON(apiUrl + "api/v0/analytics/groupsbytag?" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&tags=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+    $.getJSON(apiUrl + "api/v0/analytics/groupsbytag?" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&tags=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
         var arcSeries = [];
         $(data).each(function(key, val){
             var item = [];
@@ -642,120 +638,147 @@ var getTagReport = function (from, to) {
             item.push(val.count);
             arcSeries.push(item);
         });
-        buildArcChart(arcSeries, "tag-count-container", 'Groups By Tag', 'Groups', '{series.name}: <b>{point.y}</b>');
-  });
+        buildArcChart(arcSeries.reverse(), "tag-count-container", 'Groups By Tag', 'Groups', '{series.name}: <b>{point.y}</b>');
+    });
 };
 
 var getLocationReport = function (from, to) {
-    $.getJSON(apiUrl + "api/v0/analytics/monthlygrowthbylocation?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
-        var table = $(".table-responsive");
+    
+    if (!($("#meetup-location").val().trim() == "country" && document.getElementById("location").value == "US")) {
+        $(".data-map").hide();
+    }
+    else
+    {
+        $(".data-map").show();
+        $.getJSON(apiUrl + "api/v0/analytics/monthlygrowthbylocation?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+            var table = $(".table-responsive");
 
-        $(table).empty();
+            $(table).empty();
 
-        // Get months between the dates
-        var monthCount = monthDiff(new Date(from), new Date(to));
-        var categories = [];
-        var series = [];
-        var seriesVariance = [];
+            // Get months between the dates
+            var monthCount = monthDiff(new Date(from), new Date(to));
+            var categories = [];
+            var series = [];
+            var seriesVariance = [];
 
-        // Collect unique dates for categories
-        var categoryArr = [];
-        var seriesName = [];
-
-        $.each(data, function (key, val) {
-            categoryArr.push(val.date);
-            if ($.inArray((val.tag + "|" + val.city), seriesName.map(function(d) { return d.tag + "|" + d.city; })) == -1)
-            {
-                seriesName.push({ tag: val.tag, city: val.city });
-            }
-        });
-
-        categories = categoryArr.getUnique();
-        var names = seriesName;
-
-        $.each(names, function (i, item) {
-            var dataPoints = [];
-            var dataPointValues = [];
-
+            // Collect unique dates for categories
+            var categoryArr = [];
+            var seriesName = [];
 
             $.each(data, function (key, val) {
-                if (val.tag == item.tag && val.city == item.city) {
-                    dataPointsArr = [];
-                    var thisDateTime = new Date(val.date);
-                    var utcDateTime = Date.UTC(thisDateTime.getUTCFullYear(), thisDateTime.getUTCMonth(), thisDateTime.getUTCDate());
-                    dataPointsArr.push(utcDateTime);
-                    dataPointsArr.push(val.members);
-                    dataPoints.push(dataPointsArr);
-                    dataPointValues.push(val.members);
-                };
+                categoryArr.push(val.date);
+                if ($.inArray((val.tag + "|" + val.city), seriesName.map(function(d) { return d.tag + "|" + d.city; })) == -1)
+                {
+                    seriesName.push({ tag: val.tag, city: val.city, lat: val.lat, lng: val.lon });
+                }
             });
 
-            var dataPointPercent = [];
-            
-            for (var j = 0; j < dataPoints.length; j++) {
-                if (j > 0) 
-                {
-                    var min = dataPoints[j - 1][1];
-                    var max = dataPoints[j][1];
-                    dataPointPercent.push([dataPoints[j][0], ((max - min) / min).toFixed(2) * 100]);
+            categories = categoryArr.getUnique();
+            var names = seriesName;
+
+            $.each(names, function (i, item) {
+                var dataPoints = [];
+                var dataPointValues = [];
+
+
+                $.each(data, function (key, val) {
+                    if (val.tag == item.tag && val.city == item.city) {
+                        dataPointsArr = [];
+                        var thisDateTime = new Date(val.date);
+                        var utcDateTime = Date.UTC(thisDateTime.getUTCFullYear(), thisDateTime.getUTCMonth(), thisDateTime.getUTCDate());
+                        dataPointsArr.push(utcDateTime);
+                        dataPointsArr.push(val.members);
+                        dataPoints.push(dataPointsArr);
+                        dataPointValues.push(val.members);
+                    };
+                });
+
+                var dataPointPercent = [];
+                
+                for (var j = 0; j < dataPoints.length; j++) {
+                    if (j > 0) 
+                    {
+                        var min = dataPoints[j - 1][1];
+                        var max = dataPoints[j][1];
+                        dataPointPercent.push([dataPoints[j][0], ((max - min) / min).toFixed(2) * 100]);
+                    }
                 }
-            }
 
-           
+               
 
-            // Only measure annual percent growth for groups older than a year
-          
+                // Only measure annual percent growth for groups older than a year
                 seriesVariance.push({
                     name: item.tag,
                     city: item.city,
+                    lat: item.lat,
+                    lng: item.lng,
                     data: (jStat(dataPointValues).max() - jStat(dataPointValues).min()) / jStat([jStat(dataPointValues).min(), 1]).max()
                 });
+                
+            });
+
+            seriesVariance.sort(function (a, b) {
+                return b.data - a.data
+            });
+
+            
+            var uniqueTags = seriesVariance.map(function(d) { return d.name; }).getUnique();
+            var tableTemplate = '<div class="panel panel-default"><div class="panel-heading">%name%</div><table class="table table-striped table-result-view-tag"><thead><tr><th style="padding-left: 1em;">City</th><th>Growth</th></tr></thead><tbody class="%tag% .growth-table"></tbody></table></div>';
+
+            var bubbles = [];
+
+            $.each(uniqueTags, function(a, b) {
+                $.each(seriesVariance, function (key, val) {
+                        
+                    var tagName = val.name, 
+                    cityName = val.city, 
+                    percentLabel = numeral(parseFloat(val.data.toFixed(2))).format('0%'), 
+                    percentGrowth = val.data,
+                    lat = val.lat,
+                    lng = val.lng;
+                    
+                    bubbles.push({
+                        name: cityName,
+                        radius:  jStat([jStat([percentGrowth * 3, 3.5]).max(), 15]).min(),
+                        tag: tagName,
+                        growth: percentLabel,
+                        fillKey: tagName,
+                        latitude: lat,
+                        longitude: lng
+                    });
+                });
+            });
+
+            initDataMap(bubbles);
+
+            // $.each(uniqueTags, function(a, b)
+            // {
+            //     $.each(seriesVariance, function (key, val) {
+            //         if (val.name == b.replace("-", " ")) {
+            //             b = b.replace(" ", "-");
+            //             var items = [];
+                        
+            //             items.push("<tr><td class='growth-table-city'>" + val.city + "</td>")
+            //             items.push("<td>" + numeral(val.data).format('0%') + "</td>");
+            //             items.push("</tr>");
+            //             if($("." + b).length == 0)
+            //             {
+            //                 var newTable = $(tableTemplate.replace("%tag%", b).replace("%name%", b.replace("-", " ")));
+            //                 $(".table-responsive").append(newTable);
+            //             };
+
+            //             $("." + b). append(items.join());
+            //         }
+            //     });
+            // });
+
             
         });
+    }
 
-        seriesVariance.sort(function (a, b) {
-            return b.data - a.data
-        });
+    
 
-        
-        var uniqueTags = seriesVariance.map(function(d) { return d.name; }).getUnique();
-        var tableTemplate = '<div class="panel panel-default"><div class="panel-heading">%name%</div><table class="table table-striped table-result-view-tag"><thead><tr><th style="padding-left: 1em;">City</th><th>Growth</th></tr></thead><tbody class="%tag% .growth-table"></tbody></table></div>';
-        console.log(uniqueTags);
-        $.each(uniqueTags, function(a, b)
-        {
-            $.each(seriesVariance, function (key, val) {
-                if (val.name == b.replace("-", " ")) {
-                    b = b.replace(" ", "-");
-                    console.log(val);
-                    var items = [];
-                    
-                    items.push("<tr><td class='growth-table-city'>" + val.city + "</td>")
-                    items.push("<td>" + numeral(val.data).format('0%') + "</td>");
-                    items.push("</tr>");
-                    if($("." + b).length == 0)
-                    {
-                        var newTable = $(tableTemplate.replace("%tag%", b).replace("%name%", b.replace("-", " ")));
-                        $(".table-responsive").append(newTable);
-                    };
 
-                    $("." + b). append(items.join());
-                }
-            });
-        });
-
-        
-    });
-
-  $.getJSON(apiUrl + "api/v0/analytics/groupsbytag?" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&tags=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
-        var arcSeries = [];
-        $(data).each(function(key, val){
-            var item = [];
-            item.push(val.tag);
-            item.push(val.count);
-            arcSeries.push(item);
-        });
-        buildArcChart(arcSeries, "tag-count-container", 'Groups By Tag', 'Groups', '{series.name}: <b>{point.y}</b>');
-  });
 };
 
 var buildTagChart= function (categories, series) {

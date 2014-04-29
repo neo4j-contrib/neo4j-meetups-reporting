@@ -293,3 +293,10 @@ text {
 #rtl-support .tt-dropdown-menu {
   text-align: right;
 }
+
+.map {
+  height: 300px;
+  margin: 0 auto;
+  position: relative;
+  width: 600px;
+}
