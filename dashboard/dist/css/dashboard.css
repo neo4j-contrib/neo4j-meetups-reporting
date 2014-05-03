@@ -298,5 +298,16 @@ text {
   height: 300px;
   margin: 0 auto;
   position: relative;
-  width: 600px;
+  width: 700px;
+}
+
+.data-map .panel-body
+{
+  overflow: hidden;
+  padding: 0;
+}
+
+.datamaps-subunit
+{
+  cursor: pointer;
 }

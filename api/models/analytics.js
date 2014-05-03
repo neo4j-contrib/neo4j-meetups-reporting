@@ -189,7 +189,7 @@ var _getDailyGrowth = function (params, options, callback) {
   };
   var query = [
     'MATCH (day:Day)',
-    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'WHERE day.timestamp >= { startDate } AND day.timestamp <= { endDate }',
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
     'WHERE tag.tag in { topics }',
     'WITH tag, location, day',
@@ -214,7 +214,7 @@ var _getWeeklyGrowth = function (params, options, callback) {
   };
   var query = [
     'MATCH (day:Day { dayofweek: 1 })',
-    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'WHERE day.timestamp >= { startDate } AND day.timestamp <= { endDate }',
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
     'WHERE tag.tag in { topics }',
     'WITH tag, location, day',
@@ -239,7 +239,7 @@ var _getMonthlyGrowth = function (params, options, callback) {
   };
   var query = [
     'MATCH (d:Day)<-[:HAS_DAY]-(month:Month)',
-    'WHERE d.timestamp > { startDate } AND d.timestamp < { endDate }',
+    'WHERE d.timestamp >= { startDate } AND d.timestamp <= { endDate }',
     'WITH DISTINCT month',
     'MATCH (month:Month)-[:HAS_DAY]->(day:Day { day: 1 })',
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
@@ -266,7 +266,7 @@ var _getDailyGrowthByTag = function (params, options, callback) {
   };
   var query = [
     'MATCH (day:Day)',
-    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'WHERE day.timestamp >= { startDate } AND day.timestamp <= { endDate }',
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
     'WHERE tag.tag in { topics }',
     'WITH tag, location, day',
@@ -291,7 +291,7 @@ var _getWeeklyGrowthByTag = function (params, options, callback) {
   };
   var query = [
     'MATCH (day:Day { dayofweek: 1 })',
-    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'WHERE day.timestamp >= { startDate } AND day.timestamp <= { endDate }',
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
     'WHERE tag.tag in { topics }',
     'WITH tag, location, day',
@@ -316,7 +316,7 @@ var _getMonthlyGrowthByTag = function (params, options, callback) {
   };
   var query = [
     'MATCH (day:Day { day: 1 })',
-    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'WHERE day.timestamp >= { startDate } AND day.timestamp <= { endDate }',
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
     'WHERE tag.tag in { topics }',
     'WITH tag, location, day',
@@ -341,7 +341,7 @@ var _getDailyGrowthByLocation = function (params, options, callback) {
   };
   var query = [
     'MATCH (day:Day)',
-    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'WHERE day.timestamp >= { startDate } AND day.timestamp <= { endDate }',
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
     'WHERE tag.tag in { topics }',
     'WITH tag, location, day',
@@ -366,7 +366,7 @@ var _getWeeklyGrowthByLocation = function (params, options, callback) {
   };
   var query = [
     'MATCH (day:Day { dayofweek: 1 })',
-    'WHERE day.timestamp > { startDate } AND day.timestamp < { endDate }',
+    'WHERE day.timestamp >= { startDate } AND day.timestamp <= { endDate }',
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
     'WHERE tag.tag in { topics }',
     'WITH tag, location, day',
@@ -391,7 +391,7 @@ var _getMonthlyGrowthByLocation = function (params, options, callback) {
   };
   var query = [
     'MATCH (d:Day)<-[:HAS_DAY]-(month:Month)',
-    'WHERE d.timestamp > { startDate } AND d.timestamp < { endDate }',
+    'WHERE d.timestamp >= { startDate } AND d.timestamp <= { endDate }',
     'WITH DISTINCT month',
     'MATCH (month:Month)-[:HAS_DAY]->(day:Day { day: 1 })',
     'MATCH (tag:Tag), (location:Location' + ((params.country || params.city) ? '{ ' : '') + (params.city ? 'city: { city }' : '') + ((params.country && params.city) ? ', ' : '') + (params.country ? 'country: { country } }' : (params.city ? ' }' : '')) + ')',
