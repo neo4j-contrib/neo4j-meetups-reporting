@@ -3,6 +3,7 @@ var apiUrl = "http://localhost:3000/";
 var locationTypeahead;
 var countries;
 var cities;
+var granularity;
 
 function initTypeahead(source) {
     $('.typeahead').typeahead('destroy').unbind();
@@ -404,6 +405,27 @@ $(function () {
         initTypeahead($(this).text().trim() == "City" ? cities : countries);
     });
 
+    $(".time-series-granularity-btn").click(function () {
+        $("#granularity").val($(this).text().toLowerCase());
+        $(".time-series-granularity-btn").removeClass("selected");
+        $(this).addClass("selected");
+        if (granularity != $(this).text().toLowerCase()) {
+             granularity = $(this).text().toLowerCase();
+            var today = new Date($("#to").val());
+
+    var todayMinusYear = new Date($("#to").val());
+
+    todayMinusYear.setDate(today.getDate() - (13 * (granularity == "weekly" ? 7 : (granularity == "monthly" ? 31 : 1)))); // minus the date
+
+    $("#from").val(todayMinusYear.getMonth() + 1 + "/" + todayMinusYear.getDate() + "/" + todayMinusYear.getFullYear());
+
+    // $("#to").val(today.getMonth() + 1 + "/" + today.getDate() + "/" + today.getFullYear());
+            getTagReport($("#from").val(), $("#to").val());
+            getLocationReport($("#from").val(), $("#to").val());
+        };
+        granularity = $(this).text().toLowerCase();
+    });
+
     $(".group-location, .group-tags").keypress(function (event) {
         if (event.which == 13) {
             event.preventDefault();
@@ -418,7 +440,7 @@ $(function () {
 
     var todayMinusYear = new Date();
 
-    todayMinusYear.setDate(today.getDate() - 365); // minus the date
+    todayMinusYear.setDate(today.getDate() - (13 * (granularity == "weekly" ? 7 : (granularity == "monthly" ? 31 : 1)))); // minus the date
 
     $("#from").val(todayMinusYear.getMonth() + 1 + "/" + todayMinusYear.getDate() + "/" + todayMinusYear.getFullYear());
 
@@ -538,7 +560,7 @@ var getGroupReport = function (from, to) {
 
 var getTagReport = function (from, to) {
     $('.loader').show();
-    $.getJSON(apiUrl + "api/v0/analytics/monthlygrowthbytag?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
+    $.getJSON(apiUrl + "api/v0/analytics/" + $("#granularity").val().trim() + "growthbytag?startDate=" + encodeURIComponent(from) + "&endDate=" + encodeURIComponent(to) + "&" + $("#meetup-location").val().trim() + "=" + encodeURIComponent(document.getElementById("location").value) + "&topics=" + encodeURIComponent($(".group-tags").val()) + "&api_key=special-key&neo4j=true", function (data) {
         $('.loader').hide();
 
         // Get months between the dates
@@ -583,7 +605,13 @@ var getTagReport = function (from, to) {
                 {
                     var min = dataPoints[j - 1][1];
                     var max = dataPoints[j][1];
-                    dataPointPercent.push([dataPoints[j][0], ((max - min) / min).toFixed(2) * 100]);
+                    //console.log(jStat(dataPoints.map(function(d){ return d[1]; })).meandev());
+                    var globalMax = jStat(dataPoints.map(function(d){ return d[1]; })).max();
+                    var globalMin = jStat(dataPoints.map(function(d){ return d[1]; })).min();
+                    var median = jStat(dataPoints.map(function(d){ return d[1]; })).median();
+                    var meanDev = jStat(dataPoints.map(function(d){ if(d[1] < globalMax) { return d[1]; } else { return median; }; })).stdev();
+                    var dataPoint = (max - min);
+                    dataPointPercent.push([dataPoints[j][0], jStat([jStat([dataPoint > meanDev ? 0 : dataPoint, 0]).max(), meanDev]).min()]); //((max - min) / min).toFixed(2) * 100]);
                 }
             }
 
@@ -739,7 +767,7 @@ var getLocationReport = function (from, to) {
                     
                     bubbles.push({
                         name: cityName,
-                        radius:  jStat([jStat([percentGrowth * 3, 3.5]).max(), 15]).min(),
+                        radius:  jStat([jStat([percentGrowth * 50, 1]).max(), 15]).min(),
                         tag: tagName,
                         growth: percentLabel,
                         fillKey: tagName,
@@ -786,10 +814,10 @@ var buildTagChart= function (categories, series) {
     var chartOptions = {
         chart: {
             renderTo: 'tag-container',
-            type: 'line'
+            type: 'area'
         },
         title: {
-            text: 'Meetup Tag Growth % in ' + document.getElementById("location").value,
+            text: 'Membership Count By Tag ' + document.getElementById("location").value,
         },
         legend: {
             layout: 'vertical',
@@ -799,12 +827,16 @@ var buildTagChart= function (categories, series) {
             y: 50
         },
         subtitle: {
-            text: 'Meetup.com data'
+            text: 'Source: meetup.com'
         },
         plotOptions: {
             series: {
-                lineWidth: 2
-            }
+                lineWidth: 2.2
+            },
+            area: {
+                    fillOpacity: 0.2,
+                    dashStyle: "ShortDot"
+                }
         },
         xAxis: {
             type: 'datetime',
@@ -816,15 +848,15 @@ var buildTagChart= function (categories, series) {
         },
         yAxis: {
             title: {
-                text: '% Growth'
+                text: 'New Members'
             },
             min: 0,
             gridLineColor: '#DDDDDD'
         },
         tooltip: {
             formatter: function () {
-                return '<b>' + this.series.name + '</b><br/>' +
-                    Highcharts.dateFormat("%b '%y", this.x) + ': ' + this.y.toFixed(0) + '%';
+                return this.series.name + '<br/>' +
+                    '<i>' + Highcharts.dateFormat("%b %d", this.x) + '</i><br/><b>' + (this.y > 0 ? ("+" + this.y) : this.y) + "</b>";
             }
         },
 
@@ -902,7 +934,7 @@ function buildBarChart(data)
                 renderTo: 'bar-container'
             },
             title: {
-                text: 'Cumulative Meetup Growth'
+                text: 'Cumulative Group Growth'
             },
             subtitle: {
                 text: 'Source: Meetup.com'
@@ -916,7 +948,7 @@ function buildBarChart(data)
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Growth (%)',
+                    text: 'Member Growth',
                     align: 'high'
                 },
                 labels: {
@@ -924,7 +956,7 @@ function buildBarChart(data)
                 }
             },
             tooltip: {
-                valueSuffix: ' %'
+                valuePrefix: '+'
             },
             plotOptions: {
                 bar: {

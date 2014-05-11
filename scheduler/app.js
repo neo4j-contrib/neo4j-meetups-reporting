@@ -13,26 +13,62 @@ function parseBool(req, key) {
     return 'true' == url.parse(req.url, true).query[key];
 }
 
-var cities = getPollingCities();
-iteratorCityCallback(0, cities.length, cities);
+scheduledImport();
+//trackOnNewGroupsByCity("Neo4j");
 
+function scheduledImport()
+{
+    var options = {
+        neo4j: "neo4j"
+    };
 
+    var count = 0;
+    var length;
 
-function iteratorCityCallback(count, length, cities) {
-    if (count < length) {
-        // Get the city for this iteration
-        var city = cities[count];
+    // Get tracked groups
+    var groups = importer.getTrackedGroups({}, options, function (err, groups) {
+        // Write the group name to the console
 
+        length = groups.results[0].groups.length;
+
+        var chunkSize = 200;
+
+        // Slice groups into groups of 200
+        var groupSlices = length / chunkSize;
+        var groupBatches = [];
+
+        for(var i = 0; i < groupSlices; i++)
+        {
+            var block = (i * chunkSize) + chunkSize;
+            block = block > length ? (i * chunkSize) + (length - (i * chunkSize)) : block;
+            // Slice group of 200
+            groupBatches.push(groups.results[0].groups.slice(i * chunkSize, block));
+        }
+
+        // Call the iterator callback to iterate the data import process sequentially
+        iteratorTrackGroupBatchCallback(0, groupBatches.length, groupBatches);
+
+        // Slice each group call into batches of 100
+        //console.log(groups.results[0].groups.join(', '));
+    });
+}
+
+// Begin tracking on new groups
+function trackOnNewGroupsByCity(topic)
+{
+    var cities = getPollingCities();
+    iteratorCityCallback(0, cities.length, cities, topic);
+}
+
+function iteratorTrackGroupBatchCallback(batchCount, batchLength, batchGroups) {
+    console.log(batchCount + " " + batchLength + " " + batchGroups.length)
+    if (batchCount < batchLength) {
         // Import group stats for day
         meetup.getGroups({
-            'topic': 'NoSQL',
-            'country': city.countryCode,
-            'city': city.city,
-            'state': city.state,
-            'page': '100'
+            'group_id': batchGroups[batchCount].join(', ')
         }, function (err, groups) {
             // Call the iterator callback to iterate the data import process sequentially
-            iteratorGroupCallback(0, groups.results.length, groups.results, count, length, cities);
+            iteratorTrackGroupCallback(0, groups.results.length, groups.results, batchCount, batchLength, batchGroups);
         });
     }
     else
@@ -42,7 +78,52 @@ function iteratorCityCallback(count, length, cities) {
     }
 }
 
-function geoCodeCallback(count, length, groups, city_count, city_length, cities) {
+function iteratorTrackGroupCallback(count, length, groups, batchCount, batchLength, batchGroups) {
+    if (count < length) {
+        var group = groups[count];
+        var key = getGeoLocationKey(group);
+
+        //Check geo location cache
+        if (!geoLocationCache[key]) {
+            var callback = geoCodeTrackedGroupCallback(count, length, groups, batchCount, batchLength, batchGroups);
+            console.log(key);
+            getCityGeocode(groups[count], callback);
+        }
+        else
+        {
+            importTrackedGroupStats(count, length, groups, batchCount, batchLength, batchGroups);   
+        }
+    } else {
+        iteratorTrackGroupBatchCallback(batchCount + 1, batchLength, batchGroups);
+    }
+}
+
+
+function iteratorCityCallback(count, length, cities, topic) {
+    if (count < length) {
+        // Get the city for this iteration
+        var city = cities[count];
+
+        // Import group stats for day
+        meetup.getGroups({
+            'topic': topic,
+            'country': city.countryCode,
+            'city': city.city,
+            'state': city.state,
+            'page': '100'
+        }, function (err, groups) {
+            // Call the iterator callback to iterate the data import process sequentially
+            iteratorGroupCallback(0, groups.results.length, groups.results, count, length, cities, topic);
+        });
+    }
+    else
+    {
+      console.log("Import complete");
+      process.exit();
+    }
+}
+
+function geoCodeTrackedGroupCallback(count, length, groups, batchCount, batchLength, batchGroups) {
     var key = getGeoLocationKey(groups[count]);
 
     return function(err, data) {
@@ -55,14 +136,31 @@ function geoCodeCallback(count, length, groups, city_count, city_length, cities)
             return { lat: '', lon: '' };
         }
 
-        importGroupStats(count, length, groups, city_count, city_length, cities);       
+        importTrackedGroupStats(count, length, groups, batchCount, batchLength, batchGroups);       
     };
 };
 
-function importGroupStats(count, length, groups, city_count, city_length, cities)
+function geoCodeCallback(count, length, groups, city_count, city_length, cities, topic) {
+    var key = getGeoLocationKey(groups[count]);
+
+    return function(err, data) {
+        if (!err) {
+            var coordinates = data.results[0].geometry.location;
+            geoLocationCache[key] = { lat: coordinates.lat, lon: coordinates.lng };
+        }
+        else
+        {
+            return { lat: '', lon: '' };
+        }
+
+        importGroupStats(count, length, groups, city_count, city_length, cities, topic);       
+    };
+};
+
+function importTrackedGroupStats(count, length, groups, batchCount, batchLength, batchGroups)
 {
     // Get parameters from Meetup API
-    var params = getGroupImportParameters(groups[count], cities[city_count]);
+    var params = getGroupImportParameters(groups[count]);
 
     // Format parameters for Cypher REST API
     params = {
@@ -78,28 +176,51 @@ function importGroupStats(count, length, groups, city_count, city_length, cities
         // Write the group name to the console
         console.log(response.results[0].name);
 
-        iteratorGroupCallback(count + 1, length, groups, city_count, city_length, cities);
+        iteratorTrackGroupCallback(count + 1, length, groups, batchCount, batchLength, batchGroups);
     });
 }
 
-function iteratorGroupCallback(count, length, groups, city_count, city_length, cities) {
+function importGroupStats(count, length, groups, city_count, city_length, cities, topic)
+{
+    // Get parameters from Meetup API
+    var params = getGroupImportParameters(groups[count], (cities ? cities[city_count] : undefined ));
+
+    // Format parameters for Cypher REST API
+    params = {
+        'csvLine': params
+    };
+
+    var options = {
+        neo4j: "neo4j"
+    };
+
+    // Import group stats for day
+    importer.importGroupStats(params, options, function (err, response) {
+        // Write the group name to the console
+        console.log(response.results[0].name);
+
+        iteratorGroupCallback(count + 1, length, groups, city_count, city_length, cities, topic);
+    });
+}
+
+function iteratorGroupCallback(count, length, groups, city_count, city_length, cities, topic) {
     if (count < length) {
         var group = groups[count];
         var key = getGeoLocationKey(group);
 
         //Check geo location cache
         if (!geoLocationCache[key]) {
-            var callback = geoCodeCallback(count, length, groups, city_count, city_length, cities);
+            var callback = geoCodeCallback(count, length, groups, city_count, city_length, cities, topic);
             console.log(key);
             getCityGeocode(groups[count], callback);
         }
         else
         {
-            importGroupStats(count, length, groups, city_count, city_length, cities);   
+            importGroupStats(count, length, groups, city_count, city_length, cities, topic);   
         }
 
     } else {
-        iteratorCityCallback(city_count + 1, city_length, cities);
+        iteratorCityCallback(city_count + 1, city_length, cities, topic);
     }
 }
 
@@ -237,10 +358,18 @@ function getGroupImportParameters(group, city) {
     today = new Date((today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear());
     var yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
-
     var key = getGeoLocationKey(group);
+    var countryCodeDictionary = [];
 
-    
+    if (!city) {
+        getPollingCities().map(function(d)
+        {
+            countryCodeDictionary[d.countryCode] = d.countryName;
+            return d.countryName;
+        });
+
+        city = { countryName: countryCodeDictionary[group.country] };
+    };
 
     var csvLine = {
         group_name: group.name,
@@ -268,7 +397,8 @@ function getGroupImportParameters(group, city) {
         day_of_week: today.getDay() + 1,
         week_of_year: getWeekOfYear(today),
         lat: group.lat,
-        lon: group.lon
+        lon: group.lon,
+        group_id: group.id
     };
 
     return csvLine;

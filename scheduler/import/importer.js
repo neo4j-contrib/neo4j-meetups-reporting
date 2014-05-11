@@ -25,6 +25,16 @@ var _resultsImportGroupStats = function (results, callback) {
   callback(null, stats);
 };
 
+var _resultsGetTrackedGroups = function (results, callback) {
+  var groups = _.map(results, function (result) {
+    var thisGroups = {};
+    thisGroups.groups = result.groups;
+    return thisGroups;
+  });
+
+  callback(null, groups);
+};
+
 
 /**
  *  Query Functions
@@ -41,6 +51,7 @@ var _importGroupStats = function (params, options, callback) {
       'ON CREATE SET group.day = toInt({ csvLine }.group_creation_date_day)',
       'SET group.lat = { csvLine }.lat',
       'SET group.lon = { csvLine }.lon',
+      'SET group.id = { csvLine }.group_id',
       'MERGE (location:Location { city: { csvLine }.group_location, country: { csvLine }.group_country })',
       'ON CREATE SET location.countryname = { csvLine }.group_country_name',
       'ON CREATE SET location.lat = { csvLine }.group_location_lat',
@@ -70,14 +81,26 @@ var _importGroupStats = function (params, options, callback) {
   callback(null, query, params);
 };
 
+var _getTrackedGroups = function (params, options, callback) {
+
+  var query = [
+      'MATCH (group:Group)',
+      'WHERE has(group.id)',
+      'RETURN collect(DISTINCT group.id) as groups'].join('\n');
+
+  callback(null, query, params);
+};
+
 /**
  *  Result Function Wrappers
  *  a wrapper function that combines both the result functions with query functions
  */
 
 var importGroupStats = Cypher(_importGroupStats, _resultsImportGroupStats);
+var getTrackedGroups = Cypher(_getTrackedGroups, _resultsGetTrackedGroups);
 
 // export exposed functions
 module.exports = {
-  importGroupStats: importGroupStats
+  importGroupStats: importGroupStats,
+  getTrackedGroups: getTrackedGroups
 };

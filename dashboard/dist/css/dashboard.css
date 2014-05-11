@@ -9,6 +9,11 @@ body {
   font-size: 12px !important;
 }
 
+.time-series-granularity-btn.selected
+{
+  background-color: #EBEBEB;
+}
+
 text {
   font-family: 'Open Sans', sans-serif !important;
 }
@@ -74,8 +79,7 @@ text {
 
 .meetup-location-btn.selected
 {
-  background-color: #E0393E !important;
-  color: #FFFFFF;
+  background-color: #EBEBEB !important;
 }
 
 /*
