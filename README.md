@@ -10,7 +10,7 @@ Check out a demo of the dashboard: [Meetup Analytics NoSQL Dashboard](http://mee
 
 Read the full project documentation here: [Graph-based Analytics Platform Docs](https://github.com/kbastani/meetup-analytics/blob/master/docs/DOCS.md)
 
-## Architecutre
+## Architecture
 
 ![Graph-based Analytics System Diagram](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/graph-based-analytics-system-diagram.png)
 
