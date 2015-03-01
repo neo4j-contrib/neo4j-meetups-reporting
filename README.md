@@ -1,4 +1,4 @@
-# Neo4j reporting dashboard sample
+# Neo4j meetups reporting sample
 
 A graph-based reporting platform to track and measure meetup.com groups growth over time. Identify community trends and see what people are meeting about in the world. 
 
