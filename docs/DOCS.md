@@ -1,6 +1,6 @@
-# Graph-based Analytics Platform
+# Graph-based Reporting Platform
 
-Welcome to the docs page for this project. This project is meant to be a sample application for building an end-to-end analytics platform using the *Neo4j* graph database. In addition to Neo4j, this project uses the *Node.js* software platform for each of its modules. The modules in this project include a web-based dashboard with charts, a documented REST API, and scheduled data import services into Neo4j.
+Welcome to the docs page for this project. This project is meant to be a sample application for building an end-to-end reporting platform using the *Neo4j* graph database. In addition to Neo4j, this project uses the *Node.js* software platform for each of its modules. The modules in this project include a web-based dashboard with charts, a documented REST API, and scheduled data import services into Neo4j.
 
 * [Getting Started](#getting-started)
 * [Analytics REST API](#rest-api)
@@ -36,7 +36,7 @@ An [API key from Meetup.com](http://www.meetup.com/meetup_api/) is required for 
 
 # REST API
 
-This section covers the graph-based analytics REST API. This REST API communicates with the Neo4j graph database and exposes the database layer to the front-end web dashboard. The REST API is a fork of [Neo4j Swagger](#the-neo4j-swagger-project). [Swagger](#the-swagger-project) is a specification and complete framework implementation for describing, producing, consuming, and visualizing RESTful web services.
+This section covers the graph-based reporting REST API. This REST API communicates with the Neo4j graph database and exposes the database layer to the front-end web dashboard. The REST API is a fork of [Neo4j Swagger](#the-neo4j-swagger-project). [Swagger](#the-swagger-project) is a specification and complete framework implementation for describing, producing, consuming, and visualizing RESTful web services.
 
 * [Demo](#demo-1)
 * [Setup](#setup)
@@ -50,15 +50,15 @@ This section covers the graph-based analytics REST API. This REST API communicat
 
 A live online demo for the REST API is located here: [http://meetup-analytics-api.herokuapp.com/docs/](http://meetup-analytics-api.herokuapp.com/docs/)
 
-![REST API demo](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/rest-api-demo.png "Analytics REST API demo")
+![REST API demo](https://raw.githubusercontent.com/kbastani/meetup-analytics/master/docs/images/rest-api-demo.png "Reporting REST API demo")
 
 ### Setup
 
-From the terminal, go to the `api` directory of the project and run `npm install`, after `node_modules` are installed, run `node app`. The analytics REST API will be started at `http://localhost:3000`
+From the terminal, go to the `api` directory of the project and run `npm install`, after `node_modules` are installed, run `node app`. The reporting REST API will be started at `http://localhost:3000`
 
 ### Dependencies
 
-Below are the Node.js module dependencies for the analytics REST API component.
+Below are the Node.js module dependencies for the reporting REST API component.
 
 ```javascript
 "dependencies": {
